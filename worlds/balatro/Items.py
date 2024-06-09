@@ -9,7 +9,7 @@ class ItemData(NamedTuple):
 class BalatroItem(Item):
     game: str = "Balatro"
 
-offset = 12345
+offset = 5606_000
 
 # add other trash items like get money for current run or permanently increase
 # hand size, many good ideas to have here!
