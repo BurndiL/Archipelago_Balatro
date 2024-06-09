@@ -2,7 +2,7 @@ from .BalatroDecks import deck_id_to_name
 from BaseClasses import Location
 
 # ask what the fuck to put here lol
-offset = 566_000
+offset = 5606_000
 
 class BalatroLocation(Location):
     game: str = "Balatro"
