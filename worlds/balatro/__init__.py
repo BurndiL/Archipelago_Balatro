@@ -4,7 +4,7 @@ from typing import Dict, List, Union
 
 from BaseClasses import ItemClassification, Region, Tutorial
 from ..AutoWorld import WebWorld, World
-from .Items import item_name_to_id, item_id_to_name, item_table, ItemData, BalatroItem, item_frequencies, is_progression, is_useful
+from .Items import item_name_to_id, item_id_to_name, item_table, ItemData, BalatroItem, is_progression, is_useful
 from .BalatroDecks import deck_id_to_name
 # from .Options import BalatroOptions
 from .Locations import BalatroLocation, balatro_location_id_to_name, balatro_location_name_to_id
@@ -64,17 +64,22 @@ class BalatroWorld(World):
 
         #if theres any free space fill it with filler, for example traps 
         while len(self.itempool) < pool_count:
-            self.itempool.append(self.create_item("Filler Item", ItemClassification.useful))
+            self.itempool.append(self.create_item("Filler Item", ItemClassification.filler))
 
         self.multiworld.itempool += self.itempool
 
 
     def create_item(self, item: Union[str, ItemData], classification: ItemClassification = None) -> BalatroItem:
+        item_name = ""
         if isinstance(item, str):
+            item_name = item
             item = item_table[item]
+        else: 
+            item_name = item_table[item]
+
         if classification is None:
             classification = item.classification
-        return BalatroItem(item, classification, item.code, self.player)
+        return BalatroItem(item_name, classification, item.code, self.player)
 
     def create_regions(self) -> None:
         menu_region = Region("Menu", self.player, self.multiworld)
