@@ -51,13 +51,14 @@ class BalatroWorld(World):
         for item_name in item_table:
 
             #option handling goes here (once its added)
+            classification = ItemClassification.filler 
             if is_progression(item_name):
                 classification = ItemClassification.progression
             else: 
                 if (is_useful(item_name)):
                     classification = ItemClassification.progression
-                else:
-                    classification = ItemClassification.filler 
+                
+            self.itempool.append(self.create_item(item_name, classification))
             
 
         pool_count = len(balatro_location_name_to_id)
