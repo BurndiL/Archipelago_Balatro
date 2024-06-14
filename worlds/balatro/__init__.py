@@ -4,8 +4,9 @@ from typing import Dict, List, Union
 
 from BaseClasses import ItemClassification, Region, Tutorial
 from ..AutoWorld import WebWorld, World
-from .Items import item_name_to_id, item_id_to_name, item_table, ItemData, BalatroItem, is_progression, is_useful
+from .Items import item_name_to_id, item_id_to_name, item_table, offset, ItemData, BalatroItem, is_progression, is_useful
 from .BalatroDecks import deck_id_to_name
+import random
 # from .Options import BalatroOptions
 from .Locations import BalatroLocation, balatro_location_id_to_name, balatro_location_name_to_id
 # from .Options import BalatroOptions
@@ -64,8 +65,21 @@ class BalatroWorld(World):
         pool_count = len(balatro_location_name_to_id)
 
         #if theres any free space fill it with filler, for example traps 
+        # this code needs to be largely overhauled, dont care rn tho
+        counter = 0
         while len(self.itempool) < pool_count:
-            self.itempool.append(self.create_item("Filler Item", ItemClassification.filler))
+            counter += 1
+            # just make every fifth filler a trap
+            if (counter % 5):
+                trap_id = random.randint(220,222) 
+                self.itempool.append(self.create_item(item_id_to_name[trap_id + offset], ItemClassification.trap))
+            else:
+                filler_id = random.randint(200,205) 
+                # every second filler should be bonus money
+                if (counter % 2): 
+                    filler_id = 201
+                    
+                self.itempool.append(self.create_item(item_id_to_name[filler_id + offset], ItemClassification.filler))
 
         self.multiworld.itempool += self.itempool
 
