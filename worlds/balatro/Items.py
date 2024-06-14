@@ -11,8 +11,6 @@ class BalatroItem(Item):
 
 offset = 5606_000
 
-FIXTHIS = 0
-
 # important when adding new items: Do not make any items end with ".. Deck" because that will fuck the item logic
 item_table: Dict[str, ItemData] = {
     # deck unlocks
@@ -182,13 +180,56 @@ item_table: Dict[str, ItemData] = {
     "Chicot": ItemData(offset + 164),
     "Perkeo": ItemData(offset + 165),
 
+    # Vouchers
+    "Overstock": ItemData(offset + 166),
+    "Clearance Sale": ItemData(offset + 167),
+    "Hone": ItemData(offset + 168),
+    "Reroll Surplus": ItemData(offset + 169),
+    "Crystal Ball": ItemData(offset + 170),
+    "Telescope": ItemData(offset + 171),
+    "Grabber": ItemData(offset + 172),
+    "Wasteful": ItemData(offset + 173),
+    "Tarot Merchant": ItemData(offset + 174),
+    "Planet Merchant": ItemData(offset + 175),
+    "Seed Money": ItemData(offset + 176),
+    "Blank": ItemData(offset + 177),
+    "Magic Trick": ItemData(offset + 178),
+    "Hieroglyph": ItemData(offset + 179),
+    "Director's Cut": ItemData(offset + 180),
+    "Paint Brush": ItemData(offset + 181),
+    "Overstock Plus": ItemData(offset + 182),
+    "Liquidation": ItemData(offset + 183),
+    "Glow Up": ItemData(offset + 184),
+    "Reroll Glut": ItemData(offset + 185),
+    "Omen Globe": ItemData(offset + 186),
+    "Observatory": ItemData(offset + 187),
+    "Nacho Tong": ItemData(offset + 188),
+    "Recyclomancy": ItemData(offset + 189),
+    "Tarot Tycoon": ItemData(offset + 190),
+    "Planet Tycoon": ItemData(offset + 191),
+    "Money Tree": ItemData(offset + 192),
+    "Antimatter": ItemData(offset + 193),
+    "Illusion": ItemData(offset + 194),
+    "Petroglyph": ItemData(offset + 195),
+    "Retcon": ItemData(offset + 196),
+    "Palette": ItemData(offset + 197),
 
+    # Bonus Items
+    "Bonus Discards": ItemData(offset + 200),
+    "Bonus Money": ItemData(offset + 201),
+    "Bonus Starting Money" : ItemData(offset + 202),
+    "Bonus Hands"    : ItemData(offset + 203),
+    "Bonus Hand Size"    : ItemData(offset + 204),
+    "Bonus Max Interest" : ItemData(offset + 205),
 
+    # Traps 
+    "Lose All Money" : ItemData(offset + 220),
+    "Lose Discard" : ItemData(offset + 221),
+    "Lose Hand" : ItemData(offset + 222)    
 
-    # Filler
-    "Filler Item"    : ItemData(offset + FIXTHIS),
-    "Perma Hand Size Increase"    : ItemData(offset + FIXTHIS)
 }
+
+
 
 # this might not be smart, maybe check for id range instead
 def is_progression(item_name: str) -> bool:
@@ -197,9 +238,9 @@ def is_progression(item_name: str) -> bool:
 #add implementation here mayhaps
 def is_useful(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
-    return item_id >= 16 and item_id <= 166 #Jokers should be considered useful
-
-
+    return (item_id >= 16 and item_id <= 165  #Jokers should be considered useful
+        or item_id >= 166 and item_id <= 197  #Vouchers should be considered useful
+    )
 
 item_id_to_name: Dict[int, str] = {
     data.code: item_name for item_name, data in item_table.items() if data.code
