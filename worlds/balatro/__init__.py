@@ -118,7 +118,7 @@ class BalatroWorld(World):
             item_name = item_table[item]
 
         if classification is None:
-            classification = item.classification
+            classification = ItemClassification.filler
         return BalatroItem(item_name, classification, item.code, self.player)
 
     def create_regions(self) -> None:
