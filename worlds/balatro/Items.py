@@ -232,7 +232,7 @@ item_table: Dict[str, ItemData] = {
 
 
 # this might not be smart, maybe check for id range instead
-def is_progression(item_name: str) -> bool:
+def is_deck(item_name: str) -> bool:
     return item_name.endswith("Deck")
 
 #add implementation here mayhaps
