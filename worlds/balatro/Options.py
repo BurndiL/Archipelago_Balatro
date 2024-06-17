@@ -57,10 +57,28 @@ class DeathLink(Toggle):
     display_name = "Death Link"
 
 
+class Traps(Choice):
+    """How often traps will appear as filler items
+        No traps: No traps will appear
+        Low traps: 1 in 15 filler items will be traps
+        Medium traps: 1 in 7 filler items will be traps
+        High traps: 1 in 2 filler items will be traps
+        Mayhem: Every filler item will be a trap
+    """
+    display_name = "Trap Frequency"
+    option_no_traps = 0
+    option_low_amount = 1
+    option_medium_amount = 2
+    option_high_amount = 3
+    option_mayhem = 4
+    default = option_medium_amount
+
+
 @dataclass
 class BalatroOptions(PerGameCommonOptions):
     # deathlink
     deathlink: DeathLink
+
     # goal
     goal: Goal
     ante_win_goal : BeatAnteToWin
@@ -71,4 +89,7 @@ class BalatroOptions(PerGameCommonOptions):
     include_stakes : IncludeStakes
 
     # items
-    decks_unlocked : DecksUnlockedFromStart
+    decks_unlocked_from_start : DecksUnlockedFromStart
+
+    #traps 
+    trap_amount : Traps
