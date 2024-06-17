@@ -22,4 +22,4 @@ for deck in deck_id_to_name:
             prev_id += 1
             balatro_location_name_to_id[location_name] = location_id
             balatro_location_id_to_name[location_id] = location_name
-            balatro_location_id_to_stake[location_id] = ante + 1
+            balatro_location_id_to_stake[location_id] = stake + 1
