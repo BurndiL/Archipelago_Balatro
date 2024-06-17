@@ -29,6 +29,8 @@ item_table: Dict[str, ItemData] = {
     "Anaglyph Deck"  : ItemData(offset + 13),
     "Plasma Deck"    : ItemData(offset + 14),
     "Erratic Deck"   : ItemData(offset + 15),
+
+    #Jokers
     "Joker": ItemData(offset + 16),
     "Greedy Joker": ItemData(offset + 17),
     "Lusty Joker": ItemData(offset + 18),
@@ -229,8 +231,6 @@ item_table: Dict[str, ItemData] = {
 
 }
 
-
-
 # this might not be smart, maybe check for id range instead
 def is_deck(item_name: str) -> bool:
     return item_name.endswith("Deck")
@@ -249,17 +249,3 @@ item_id_to_name: Dict[int, str] = {
 item_name_to_id: Dict[str, int] = {
     item_name: data.code for item_name, data in item_table.items() if data.code
 }
-
-def item_to_unlock_event(item_name: str) -> Dict[str, str]:
-    message = f"{item_name} Acquired!"
-    action = ""
-    payload = ""
-    if item_name.endswith("Deck"):
-        action = "UNLOCK_DECK"
-        payload = str(item_table[item_name])
-
-    return {
-        "message": message,
-        "action": action,
-        "payload": payload,
-    }
