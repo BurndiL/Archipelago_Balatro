@@ -47,7 +47,7 @@ class BalatroWorld(World):
 
     def create_items(self):
 
-        decks_to_unlock = self.options.decks_unlocked 
+        decks_to_unlock = self.options.decks_unlocked_from_start 
         excludedItems : Dict[str, ItemData] = {}
         if decks_to_unlock > 0:
             # get all decks
@@ -61,7 +61,9 @@ class BalatroWorld(World):
                 deck = random.choice(deck_table)
                 deck_name = deck[0]
                 deck_data = deck[1]
-                self.multiworld.precollected_items[self.player].append(self.create_item(deck_name, ItemClassification.progression))
+                preCollected_item = self.create_item(deck_name, ItemClassification.progression)
+                self.multiworld.precollected_items[self.player].append(preCollected_item)
+                self.multiworld.push_precollected(preCollected_item)
                 deck_table.remove(deck)
                 print("start with this item: " + deck_name)
                 excludedItems[deck_name] = deck_data
@@ -70,10 +72,8 @@ class BalatroWorld(World):
 
 
         self.itempool = []
-        # add option handling here later
         for item_name in item_table:
 
-            #option handling goes here (once its added)
             classification = ItemClassification.filler 
             if is_deck(item_name):
                 classification = ItemClassification.progression
@@ -90,18 +90,29 @@ class BalatroWorld(World):
         pool_count = len(balatro_location_name_to_id)
 
         #if theres any free space fill it with filler, for example traps 
-        # this code needs to be largely overhauled, dont care rn tho
         counter = 0
+        trap_amount = 5
+        if (self.options.trap_amount.option_no_traps):
+            trap_amount = 10000
+        elif (self.options.trap_amount.option_low_amount):
+            trap_amount = 15
+        elif (self.options.trap_amount.option_medium_amount):
+            trap_amount = 7
+        elif (self.options.trap_amount.option_high_amount):
+            trap_amount = 2
+        elif (self.options.trap_amount.option_mayhem):
+            trap_amount = 1
+
         while len(self.itempool) < pool_count:
             counter += 1
-            # just make every fifth filler a trap
-            if (counter % 5):
+            
+            if (counter % trap_amount == 0):
                 trap_id = random.randint(220,222) 
                 self.itempool.append(self.create_item(item_id_to_name[trap_id + offset], ItemClassification.trap))
             else:
                 filler_id = random.randint(200,205) 
-                # every second filler should be bonus money
-                if (counter % 2): 
+                # a lot more bonus money fillers should exist because they arent as op
+                if (counter % 3 == 0): 
                     filler_id = 201
                     
                 self.itempool.append(self.create_item(item_id_to_name[filler_id + offset], ItemClassification.filler))
@@ -119,6 +130,8 @@ class BalatroWorld(World):
 
         if classification is None:
             classification = ItemClassification.filler
+
+        print(item_name)
         return BalatroItem(item_name, classification, item.code, self.player)
 
     def create_regions(self) -> None:
@@ -131,20 +144,21 @@ class BalatroWorld(World):
             for location in balatro_location_name_to_id:
                 if str(location).startswith(deck_id_to_name[deck]):
                     location_id = balatro_location_name_to_id[location]
-                    ante = balatro_location_id_to_stake[location_id]
+                    stake = balatro_location_id_to_stake[location_id]
 
                     new_location = BalatroLocation(self.player, location, location_id, deck_region)
 
                     new_location.progress_type = LocationProgressType.DEFAULT
                     
-                    if ante > self.options.include_stakes:
+                    if stake > self.options.include_stakes:
                         new_location.progress_type = LocationProgressType.EXCLUDED
 
                     deck_region.locations.append(new_location)
                     
 
             # has to have deck collected to access it
-            menu_region.connect(deck_region, None, lambda state: state.has(deck_id_to_name[deck], self.player))
+            menu_region.connect(deck_region, None, 
+                                lambda state: state.has(deck_id_to_name[deck], self.player))
             
 
     def fill_slot_data(self) -> Dict[str, Any]:
