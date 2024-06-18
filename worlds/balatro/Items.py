@@ -216,18 +216,97 @@ item_table: Dict[str, ItemData] = {
     "Retcon": ItemData(offset + 196),
     "Palette": ItemData(offset + 197),
 
+    # Booster Packs
+
+    "Arcana Pack": ItemData(offset + 198),
+    "Jumbo Arcana Pack": ItemData(offset + 199),
+    "Mega Arcana Pack": ItemData(offset + 200),
+    "Celestial Pack": ItemData(offset + 201),
+    "Jumbo Celestial Pack": ItemData(offset + 202),
+    "Mega Celestial Pack": ItemData(offset + 203),
+    "Spectral Pack": ItemData(offset + 204),
+    "Jumbo Spectral Pack": ItemData(offset + 205),
+    "Mega Spectral Pack": ItemData(offset + 206),
+    "Standard Pack": ItemData(offset + 207),
+    "Jumbo Standard Pack": ItemData(offset + 208),
+    "Mega Standard Pack": ItemData(offset + 209),
+    "Buffoon Pack": ItemData(offset + 210),
+    "Jumbo Buffoon Pack": ItemData(offset + 211),
+    "Mega Buffoon Pack": ItemData(offset + 212),
+    
+    # Tarot Cards
+
+    "The Fool": ItemData(offset + 213),
+    "The Magician": ItemData(offset + 214),
+    "The High Priestess": ItemData(offset + 215),
+    "The Empress": ItemData(offset + 216),
+    "The Emperor": ItemData(offset + 217),
+    "The Hierophant": ItemData(offset + 218),
+    "The Lovers": ItemData(offset + 219),
+    "The Chariot": ItemData(offset + 220),
+    "Justice": ItemData(offset + 221),
+    "The Hermit": ItemData(offset + 222),
+    "The Wheel of Fortune": ItemData(offset + 223),
+    "Strength": ItemData(offset + 224),
+    "The Hanged Man": ItemData(offset + 225),
+    "Death": ItemData(offset + 226),
+    "Temperance": ItemData(offset + 227),
+    "The Devil": ItemData(offset + 228),
+    "The Tower": ItemData(offset + 229),
+    "The Star": ItemData(offset + 230),
+    "The Moon": ItemData(offset + 231),
+    "The Sun": ItemData(offset + 232),
+    "Judgement": ItemData(offset + 233),
+    "The World": ItemData(offset + 234),
+
+    # Planet Cards
+
+    "Mercury": ItemData(offset + 235),
+    "Venus": ItemData(offset + 236),
+    "Earth": ItemData(offset + 237),
+    "Mars": ItemData(offset + 238),
+    "Jupiter": ItemData(offset + 239),
+    "Saturn": ItemData(offset + 240),
+    "Uranus": ItemData(offset + 241),
+    "Neptune": ItemData(offset + 242),
+    "Pluto": ItemData(offset + 243),
+    "Planet X": ItemData(offset + 244),
+    "Ceres": ItemData(offset + 245),
+    "Eris": ItemData(offset + 246),
+
+    # Spectral Cards
+
+    "Familiar": ItemData(offset + 247),
+    "Grim": ItemData(offset + 248),
+    "Incantation": ItemData(offset + 249),
+    "Talisman": ItemData(offset + 250),
+    "Aura": ItemData(offset + 251),
+    "Wraith": ItemData(offset + 252),
+    "Sigil": ItemData(offset + 253),
+    "Ouija": ItemData(offset + 254),
+    "Ectoplasm": ItemData(offset + 255),
+    "Immolate": ItemData(offset + 256),
+    "Ankh": ItemData(offset + 257),
+    "Deja Vu": ItemData(offset + 258),
+    "Hex": ItemData(offset + 259),
+    "Trance": ItemData(offset + 260),
+    "Medium": ItemData(offset + 261),
+    "Cryptid": ItemData(offset + 262),
+    "The Soul": ItemData(offset + 263),
+    "Black Hole": ItemData(offset + 264),
+
     # Bonus Items
-    "Bonus Discards": ItemData(offset + 200),
-    "Bonus Money": ItemData(offset + 201),
-    "Bonus Starting Money" : ItemData(offset + 202),
-    "Bonus Hands"    : ItemData(offset + 203),
-    "Bonus Hand Size"    : ItemData(offset + 204),
-    "Bonus Max Interest" : ItemData(offset + 205),
+    "Bonus Discards": ItemData(offset + 300),
+    "Bonus Money": ItemData(offset + 301),
+    "Bonus Starting Money" : ItemData(offset + 302),
+    "Bonus Hands"    : ItemData(offset + 303),
+    "Bonus Hand Size"    : ItemData(offset + 304),
+    "Bonus Max Interest" : ItemData(offset + 305),
 
     # Traps 
-    "Lose All Money" : ItemData(offset + 220),
-    "Lose Discard" : ItemData(offset + 221),
-    "Lose Hand" : ItemData(offset + 222)    
+    "Lose All Money" : ItemData(offset + 320),
+    "Lose Discard" : ItemData(offset + 321),
+    "Lose Hand" : ItemData(offset + 322)    
 
 }
 
@@ -235,11 +314,16 @@ item_table: Dict[str, ItemData] = {
 def is_deck(item_name: str) -> bool:
     return item_name.endswith("Deck")
 
-#add implementation here mayhaps
+# Ranges are defined like this to increase maintainability 
 def is_useful(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
-    return (item_id >= 16 and item_id <= 165  #Jokers should be considered useful
-        or item_id >= 166 and item_id <= 197  #Vouchers should be considered useful
+    return (item_id >= 16 and item_id <= 165  # Jokers should be considered useful
+        or item_id >= 166 and item_id <= 197  # Vouchers should be considered useful
+        or item_id >= 198 and item_id <= 212  # Booster Packs 
+        or item_id >= 213 and item_id <= 234  # Tarot Cards
+        or item_id >= 235 and item_id <= 246  # Planet Cards
+        or item_id >= 247 and item_id <= 264  # Spectral Cards
+         
     )
 
 item_id_to_name: Dict[int, str] = {
