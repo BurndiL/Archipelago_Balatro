@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Union
 
 from BaseClasses import ItemClassification, Region, Tutorial, LocationProgressType
 from ..AutoWorld import WebWorld, World
-from .Items import item_name_to_id, item_id_to_name, item_table, offset, ItemData, BalatroItem, is_deck, is_useful
+from .Items import item_name_to_id, item_id_to_name, item_table, is_joker, offset, ItemData, BalatroItem, is_deck, is_useful
 from .BalatroDecks import deck_id_to_name
 import random
 from .Options import BalatroOptions
@@ -42,7 +42,6 @@ class BalatroWorld(World):
     options_dataclass = BalatroOptions
     options: BalatroOptions
 
-    
     itempool: Dict[str, int]
 
     def create_items(self):
@@ -65,7 +64,7 @@ class BalatroWorld(World):
                 self.multiworld.precollected_items[self.player].append(preCollected_item)
                 self.multiworld.push_precollected(preCollected_item)
                 deck_table.remove(deck)
-                print("start with this item: " + deck_name)
+                # print("start with this item: " + deck_name)
                 excludedItems[deck_name] = deck_data
                 decks_to_unlock-=1
 
@@ -78,13 +77,15 @@ class BalatroWorld(World):
             if is_deck(item_name):
                 classification = ItemClassification.progression
             else: 
-                if (is_useful(item_name)):
+                if (is_useful(item_name) and not (item_name in self.options.filler_jokers)):
                     classification = ItemClassification.progression
                 
+
             if not item_name in excludedItems: 
+                # print(item_name + " with class: " + str(classification)) 
                 self.itempool.append(self.create_item(item_name, classification))
-            else: 
-                print("Excluded Item: " + item_name) 
+            # else: 
+                # print("Excluded Item: " + item_name) 
             
 
         pool_count = len(balatro_location_name_to_id)
@@ -131,7 +132,7 @@ class BalatroWorld(World):
         if classification is None:
             classification = ItemClassification.filler
 
-        print(item_name)
+        # print(item_name)
         return BalatroItem(item_name, classification, item.code, self.player)
 
     def create_regions(self) -> None:
