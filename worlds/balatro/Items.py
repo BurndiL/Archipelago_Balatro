@@ -317,14 +317,17 @@ def is_deck(item_name: str) -> bool:
 # Ranges are defined like this to increase maintainability 
 def is_useful(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
-    return (item_id >= 16 and item_id <= 165  # Jokers should be considered useful
+    return (is_joker(item_name)  # Jokers should be considered useful
         or item_id >= 166 and item_id <= 197  # Vouchers should be considered useful
         or item_id >= 198 and item_id <= 212  # Booster Packs 
         or item_id >= 213 and item_id <= 234  # Tarot Cards
         or item_id >= 235 and item_id <= 246  # Planet Cards
         or item_id >= 247 and item_id <= 264  # Spectral Cards
-         
     )
+
+def is_joker(item_name: str) -> bool:
+    item_id = item_name_to_id[item_name] - offset
+    return (item_id >= 16 and item_id <= 165)
 
 item_id_to_name: Dict[int, str] = {
     data.code: item_name for item_name, data in item_table.items() if data.code
