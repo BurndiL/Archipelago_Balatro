@@ -66,6 +66,29 @@ class IncludeStakes(Range):
     range_end = 8
     default = 2
 
+class ShopItems(Range):
+    """Number of AP Checks that will be buyable in the shop""" 
+    display_name = "Number of AP shop Items"
+    range_start = 0
+    range_end = 60
+    default = 30
+
+
+class MinimumShopPrice(Range):
+    """The minimum price for an AP Item in the shop"""
+    display_name = "Minimum Price of AP Item in shop"
+    range_start = 1
+    range_end = 30
+    default = 1
+
+class MaximumShopPrice(Range):
+    """The maximum price for an AP Item in the shop"""
+    display_name = "Maximum Price of AP Item in shop"
+    range_start = 1
+    range_end = 100
+    default = 10
+
+
 class DecksUnlockedFromStart(Range):
     """Number of decks you want to start with."""
     display_name = "Number of starting decks"
@@ -113,6 +136,9 @@ class BalatroOptions(PerGameCommonOptions):
     # items
     decks_unlocked_from_start : DecksUnlockedFromStart
     filler_jokers : FillerJokers
+    shop_items : ShopItems
+    minimum_price : MinimumShopPrice
+    maximum_price : MaximumShopPrice
 
     #traps 
     trap_amount : Traps
