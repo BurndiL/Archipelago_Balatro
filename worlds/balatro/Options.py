@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from enum import IntEnum
 from typing import TypedDict
-from Options import DefaultOnToggle, PerGameCommonOptions, Toggle, Range, Choice
+from .Items import item_table, is_joker
+from Options import DefaultOnToggle, OptionSet, PerGameCommonOptions, Toggle, Range, Choice
 
 class Goal(Choice):
     """Goal for this playthrough
@@ -35,6 +36,27 @@ class UnlockJokersToWin(Range):
     range_start = 1
     range_end = 150
     default = 75
+
+class FillerJokers(OptionSet):
+    """
+    Which Jokers are supposed to be filler (every Joker not in this list will be considered useful)
+    Be careful with this option if your goal is "Unlock Jokers"
+
+    Valid Jokers:
+        "Abstract Joker"
+        "Acrobat"
+        "Ancient Joker" 
+        "....."
+
+        for a full list go to https://balatrogame.fandom.com/wiki/Category:Jokers
+        
+
+    Example: ['Abstract Joker', 'Acrobat', 'Ancient Joker']
+    """
+    display_name = "Set jokers as filler"
+    default = []
+    valid_keys = [key for key, _ in item_table.items() if is_joker(key)]
+
 
 class IncludeStakes(Range):
     """Number of Stakes that can have important checks: 
@@ -90,6 +112,7 @@ class BalatroOptions(PerGameCommonOptions):
 
     # items
     decks_unlocked_from_start : DecksUnlockedFromStart
+    filler_jokers : FillerJokers
 
     #traps 
     trap_amount : Traps
