@@ -171,7 +171,8 @@ class BalatroWorld(World):
         self.shop_locations = Locations.create_shop_locations(Locations.prev_id, self.options.shop_items)
         shop_region = Region("Shop", self.player, self.multiworld)
         for location in self.shop_locations:
-            new_location = BalatroLocation(self.player, self.shop_locations[location], location, shop_region)
+            # print(str(self.shop_locations[location]) + " with id: " + str(location))
+            new_location = BalatroLocation(self.player, str(self.shop_locations[location]), location, shop_region)
             shop_region.locations.append(new_location)
 
         self.multiworld.regions.append(shop_region)
@@ -188,8 +189,8 @@ class BalatroWorld(World):
             "decks_win_goal": self.options.decks_win_goal.value,
             "jokers_unlock_goal": self.options.jokers_unlock_goal.value,
             "shop_locations" : [key for key, _ in self.shop_locations.items()],
-            "minimum_price" : self.options.minimum_price,
-            "maximum_price" : self.options.maximum_price,
+            "minimum_price" : self.options.minimum_price.value,
+            "maximum_price" : self.options.maximum_price.value,
             "deathlink": bool(self.options.deathlink)
         }
         return base_data
