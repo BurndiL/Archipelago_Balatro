@@ -31,6 +31,11 @@ def create_shop_locations(prev_id, amount) -> dict:
     result = dict()
     for i in range(amount):
         prev_id += 1
-        result[prev_id] = "Shop Item " + str(i+1)
+        location_name = "Shop Item " + str(i+1)
+        location_id = prev_id
+        result[prev_id] = location_name
+
+        balatro_location_name_to_id[location_name] = location_id
+        balatro_location_id_to_name[location_id] = location_name
 
     return result
