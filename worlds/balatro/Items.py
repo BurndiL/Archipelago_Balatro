@@ -336,3 +336,7 @@ item_id_to_name: Dict[int, str] = {
 item_name_to_id: Dict[str, int] = {
     item_name: data.code for item_name, data in item_table.items() if data.code
 }
+
+jokers: Dict[int, str] = {
+    data.code: item_name for item_name, data in item_table.items() if data.code and is_joker(item_name)
+}
