@@ -31,7 +31,7 @@ class BalatroWorld(World):
     web = BalatroWebWorld()
 
     #dont know what this does yet
-    topology_present = False
+    topology_present = True
 
     item_name_to_id = item_name_to_id
     item_id_to_name = item_id_to_name
@@ -80,7 +80,7 @@ class BalatroWorld(World):
                 classification = ItemClassification.progression
             else: 
                 if (is_useful(item_name) and not (item_name in self.options.filler_jokers)):
-                    classification = ItemClassification.progression
+                    classification = ItemClassification.useful
                 
 
             if not item_name in excludedItems: 
@@ -90,7 +90,7 @@ class BalatroWorld(World):
                 # print("Excluded Item: " + item_name) 
             
 
-        pool_count = len(balatro_location_name_to_id) + self.options.shop_items
+        pool_count = len(balatro_location_name_to_id)
 
         #if theres any free space fill it with filler, for example traps 
         counter = 0
@@ -110,13 +110,13 @@ class BalatroWorld(World):
             counter += 1
             
             if (counter % trap_amount == 0):
-                trap_id = random.randint(220,222) 
+                trap_id = random.randint(320,322) 
                 self.itempool.append(self.create_item(item_id_to_name[trap_id + offset], ItemClassification.trap))
             else:
-                filler_id = random.randint(200,205) 
+                filler_id = random.randint(300,305) 
                 # a lot more bonus money fillers should exist because they arent as op
                 if (counter % 3 == 0): 
-                    filler_id = 201
+                    filler_id = 301
                     
                 self.itempool.append(self.create_item(item_id_to_name[filler_id + offset], ItemClassification.filler))
 
@@ -134,7 +134,6 @@ class BalatroWorld(World):
         if classification is None:
             classification = ItemClassification.filler
 
-        # print(item_name)
         return BalatroItem(item_name, classification, item.code, self.player)
 
     def create_regions(self) -> None:
@@ -144,7 +143,7 @@ class BalatroWorld(World):
 
         for deck in deck_id_to_name:
             deck_name = deck_id_to_name[deck]
-            print(deck_name)
+            # print(deck_name)
             
             deck_region = Region(deck_name, self.player, self.multiworld)
             for location in balatro_location_name_to_id:
@@ -163,6 +162,7 @@ class BalatroWorld(World):
                     
             self.multiworld.regions.append(deck_region)
             # has to have deck collected to access it
+            # print(deck_name)
             menu_region.connect(deck_region, None, 
                                 lambda state: state.has(deck_name, self.player))
             
@@ -173,10 +173,14 @@ class BalatroWorld(World):
         for location in self.shop_locations:
             # print(str(self.shop_locations[location]) + " with id: " + str(location))
             new_location = BalatroLocation(self.player, str(self.shop_locations[location]), location, shop_region)
+            new_location.progress_type = LocationProgressType.DEFAULT
+            
             shop_region.locations.append(new_location)
 
         self.multiworld.regions.append(shop_region)
-        menu_region.connect(shop_region, None, lambda state: state.has_any(deck_id_to_name.items(), self.player))
+        menu_region.connect(shop_region, "Shop", lambda state: state.has_any(deck_id_to_name.items(), self.player))
+        # from Utils import visualize_regions
+        # visualize_regions(self.multiworld.get_region("Menu", self.player), "my_world.puml")
         
 
     def fill_slot_data(self) -> Dict[str, Any]:
