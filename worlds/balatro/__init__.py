@@ -63,7 +63,6 @@ class BalatroWorld(World):
                 deck_name = deck[0]
                 deck_data = deck[1]
                 preCollected_item = self.create_item(deck_name, ItemClassification.progression)
-                self.multiworld.precollected_items[self.player].append(preCollected_item)
                 self.multiworld.push_precollected(preCollected_item)
                 deck_table.remove(deck)
                 # print("start with this item: " + deck_name)
@@ -76,7 +75,7 @@ class BalatroWorld(World):
         for item_name in item_table:
 
             classification = ItemClassification.filler 
-            if is_deck(item_name):
+            if is_deck(item_name) or (self.options.goal == "unlock_jokers" and is_joker(item_name)):
                 classification = ItemClassification.progression
             else: 
                 if (is_useful(item_name) and not (item_name in self.options.filler_jokers)):
@@ -173,28 +172,28 @@ class BalatroWorld(World):
                 self.shop_locations[location] = balatro_location_name_to_id[location]
 
         shop_region = Region("Shop", self.player, self.multiworld)
+        self.shop_locations = Locations.create_shop_locations(self.options.shop_items.value)
+        
         counter = 0
         for location in self.shop_locations:
             counter += 1
             new_location = BalatroLocation(self.player, str(self.shop_locations[location]), location, shop_region)
-            if counter > self.options.shop_items:
-                new_location.progress_type = LocationProgressType.EXCLUDED
-            else:
-                new_location.progress_type = LocationProgressType.DEFAULT
+
+            new_location.progress_type = LocationProgressType.DEFAULT
             
             shop_region.locations.append(new_location)
 
         self.multiworld.regions.append(shop_region)
-        menu_region.connect(shop_region, "Shop", lambda state: state.has_any(deck_id_to_name.values(), self.player))
+        menu_region.connect(shop_region, None, lambda state: state.has_any(list(deck_id_to_name.values()), self.player))
         # from Utils import visualize_regions
         # visualize_regions(self.multiworld.get_region("Menu", self.player), "my_world.puml")
         
         if self.options.goal == "beat_decks":
-            self.multiworld.completion_condition[self.player] = lambda state: state.has_from_list(deck_id_to_name.values(), self.player, self.options.decks_win_goal.value)
+            self.multiworld.completion_condition[self.player] = lambda state: state.has_from_list(list(deck_id_to_name.values()), self.player, self.options.decks_win_goal.value)
         elif self.options.goal == "unlock_jokers":
-            self.multiworld.completion_condition[self.player] = lambda state: state.has_from_list(jokers.values(), self.player, self.options.jokers_unlock_goal.value)
+            self.multiworld.completion_condition[self.player] = lambda state: state.has_from_list(list(jokers.values()), self.player, self.options.jokers_unlock_goal.value)
         elif self.options.goal == "beat_ante":
-            self.multiworld.completion_condition[self.player] = lambda state: state.has_any(deck_id_to_name.values(), self.player)
+            self.multiworld.completion_condition[self.player] = lambda state: state.has_any(list(deck_id_to_name.values()), self.player)
 
     def fill_slot_data(self) -> Dict[str, Any]:
         return self.fill_json_data()
