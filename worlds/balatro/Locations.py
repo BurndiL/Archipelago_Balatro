@@ -26,21 +26,14 @@ for deck in deck_id_to_name:
             balatro_location_name_to_id[location_name] = location_id
             balatro_location_id_to_name[location_id] = location_name
             balatro_location_id_to_stake[location_id] = stake + 1
-
-def create_shop_locations(amount) -> dict:
-    # shop locations
-    prev_id = len(balatro_location_name_to_id)
-    ret = dict()
-    for i in range(amount):
+            
+for i in range(60):
+    
+    prev_id += 1
+    location_name = "Shop Item " + str(i+1)
+    location_id = prev_id
+    
+    balatro_location_name_to_id[location_name] = location_id
+    balatro_location_id_to_name[location_id] = location_name
         
-        prev_id += 1
-        location_name = "Shop Item " + str(i+1)
-        location_id = prev_id
-
-        ret[location_id] = location_name
-        balatro_location_name_to_id[location_name] = location_id
-        balatro_location_id_to_name[location_id] = location_name
-        
-    return ret
-
 

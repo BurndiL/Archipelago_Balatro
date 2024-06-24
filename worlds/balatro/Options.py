@@ -59,8 +59,11 @@ class FillerJokers(OptionSet):
 
 
 class IncludeStakes(Range):
-    """Number of Stakes that can have important checks: 
-    1 is White Stake, 2 is White and Green Stake, etc"""
+    """Number of Stakes that can contain locations:
+    1 is White Stake, 2 is White and Green Stake, etc
+    minimum value: 1
+    maximum value: 8
+    """
     display_name = "Include Stakes to have important Checks"
     range_start = 1
     range_end = 8
