@@ -302,6 +302,8 @@ item_table: Dict[str, ItemData] = {
     "Bonus Hands"    : ItemData(offset + 303),
     "Bonus Hand Size"    : ItemData(offset + 304),
     "Bonus Max Interest" : ItemData(offset + 305),
+    "Bonus Joker Slot" : ItemData(offset + 306),
+    "Bonus Consumable Slot" : ItemData(offset + 307),
 
     # Traps 
     "Lose All Money" : ItemData(offset + 320),

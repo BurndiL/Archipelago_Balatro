@@ -112,10 +112,14 @@ class BalatroWorld(World):
                 trap_id = random.randint(320, 322)
                 self.itempool.append(self.create_item(item_id_to_name[trap_id + offset], ItemClassification.trap))
             else:
-                filler_id = random.randint(300, 305)
+                filler_id = random.randint(300, 307)
                 # a lot more bonus money fillers should exist because they arent as op
                 if (counter % 3 == 0):
                     filler_id = 301
+                    
+                # filler items 306 - 309 are more over powered, so theres a 50% chance they get replaced by less op fillers
+                if (filler_id > 305 and random.randint(1,2) == 1): 
+                    filler_id -= 5
 
                 self.itempool.append(self.create_item(item_id_to_name[filler_id + offset], ItemClassification.filler))
 
