@@ -105,21 +105,28 @@ class BalatroWorld(World):
         elif (self.options.trap_amount.option_mayhem):
             trap_amount = 1
 
+
+        op_filler_max = 3
+        op_filler = 1
+
         while len(self.itempool) < pool_count:
             counter += 1
 
             if (counter % trap_amount == 0):
-                trap_id = random.randint(320, 322)
+                trap_id = random.randint(320, 325)
                 self.itempool.append(self.create_item(item_id_to_name[trap_id + offset], ItemClassification.trap))
             else:
-                filler_id = random.randint(300, 307)
-                # a lot more bonus money fillers should exist because they arent as op
-                if (counter % 3 == 0):
-                    filler_id = 301
+                filler_id = 310
+                if op_filler_max > 0:
+                    filler_id = op_filler + 300
+                    op_filler += 1
+                    if op_filler == 8:
+                        op_filler = 1
+                        op_filler_max -= 1
                     
-                # filler items 306 - 309 are more over powered, so theres a 50% chance they get replaced by less op fillers
-                if (filler_id > 305 and random.randint(1,2) == 1): 
-                    filler_id -= 5
+                # after all good filler items are placed, fill the rest with normal filler items
+                else:
+                    filler_id = random.randint(310, 314)
 
                 self.itempool.append(self.create_item(item_id_to_name[filler_id + offset], ItemClassification.filler))
 

@@ -295,20 +295,29 @@ item_table: Dict[str, ItemData] = {
     "The Soul": ItemData(offset + 263),
     "Black Hole": ItemData(offset + 264),
 
-    # Bonus Items
-    "Bonus Discards": ItemData(offset + 300),
-    "Bonus Money": ItemData(offset + 301),
+    # OP Filler Bonus Items
+    "Bonus Discards": ItemData(offset + 301),
     "Bonus Starting Money" : ItemData(offset + 302),
     "Bonus Hands"    : ItemData(offset + 303),
     "Bonus Hand Size"    : ItemData(offset + 304),
     "Bonus Max Interest" : ItemData(offset + 305),
     "Bonus Joker Slot" : ItemData(offset + 306),
     "Bonus Consumable Slot" : ItemData(offset + 307),
+    
+    # Filler Bonus Items
+    "Bonus Money": ItemData(offset + 310),
+    "Receive Buffoon Pack" : ItemData(offset + 311),
+    "Receive Consumable Pack" : ItemData(offset + 312),
+    "Plus 3 Hand Size Next Round" : ItemData(offset + 313),
+    "Rerolls Start At $0 Next Shop" : ItemData(offset + 314),
 
     # Traps 
     "Lose All Money" : ItemData(offset + 320),
     "Lose Discard" : ItemData(offset + 321),
-    "Lose Hand" : ItemData(offset + 322)    
+    "Lose Hand" : ItemData(offset + 322),
+    "Make Random Joker Perishable" : ItemData(offset + 323),
+    "Make Random Joker Eternal" : ItemData(offset + 324),
+    "Make Random Joker Rental" : ItemData(offset + 325)
 
 }
 
