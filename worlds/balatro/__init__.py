@@ -172,7 +172,7 @@ class BalatroWorld(World):
             # has to have deck collected to access it
             # print(deck_name)
             menu_region.connect(deck_region, None,
-                                lambda state: state.has(deck_name, self.player))
+                                lambda state, _deck_name_ = deck_name: state.has(_deck_name_, self.player))
 
         # Shop Region
         
