@@ -9,7 +9,7 @@ from .Items import item_name_to_id, item_id_to_name, item_table, is_joker, joker
 from .BalatroDecks import deck_id_to_name
 import random
 from worlds.generic.Rules import add_rule
-from .Options import BalatroOptions
+from .Options import BalatroOptions, Traps
 from .Locations import BalatroLocation, balatro_location_id_to_name, balatro_location_name_to_id, \
     balatro_location_id_to_stake, shop_id_offset, balatro_location_id_to_ante, max_shop_items
 
@@ -83,7 +83,9 @@ class BalatroWorld(World):
             elif is_useful(item_name):
                 classification = ItemClassification.useful
 
-            if not item_name in excludedItems:
+            if not item_name in excludedItems and \
+                classification == ItemClassification.progression or \
+                classification == ItemClassification.useful:
                 # print(item_name + " with class: " + str(classification)) 
                 self.itempool.append(self.create_item(item_name, classification))
             # else: 
@@ -93,18 +95,17 @@ class BalatroWorld(World):
 
         # if there's any free space fill it with filler, for example traps
         counter = 0
-        trap_amount = 5
-        if self.options.trap_amount.option_no_traps:
-            trap_amount = 10000
-        elif (self.options.trap_amount.option_low_amount):
+        trap_amount = -1
+        if self.options.trap_amount == Traps.option_no_traps:
+            trap_amount = -1
+        elif (self.options.trap_amount == Traps.option_low_amount):
             trap_amount = 15
-        elif (self.options.trap_amount.option_medium_amount):
+        elif (self.options.trap_amount == Traps.option_medium_amount):
             trap_amount = 7
-        elif (self.options.trap_amount.option_high_amount):
+        elif (self.options.trap_amount == Traps.option_high_amount):
             trap_amount = 2
-        elif (self.options.trap_amount.option_mayhem):
+        elif (self.options.trap_amount == Traps.option_mayhem):
             trap_amount = 1
-
 
         op_filler_max = self.options.permanent_filler.value - 1
         op_filler = 1
@@ -112,7 +113,7 @@ class BalatroWorld(World):
         while len(self.itempool) < pool_count:
             counter += 1
 
-            if (counter % trap_amount == 0):
+            if (trap_amount != -1 and counter % trap_amount == 0):
                 trap_id = random.randint(320, 325)
                 self.itempool.append(self.create_item(item_id_to_name[trap_id + offset], ItemClassification.trap))
             else:
