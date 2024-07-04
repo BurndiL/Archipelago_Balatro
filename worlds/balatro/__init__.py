@@ -52,7 +52,6 @@ class BalatroWorld(World):
     itempool: Dict[str, int]
 
     def create_items(self):
-
         decks_to_unlock = self.options.decks_unlocked_from_start
         excludedItems: Dict[str, ItemData] = {}
         if decks_to_unlock > 0:
@@ -86,6 +85,15 @@ class BalatroWorld(World):
             if not item_name in excludedItems and \
                 classification == ItemClassification.progression or \
                 classification == ItemClassification.useful:
+                    
+                # fix typo from base game
+                joker_Filler = item_name
+                if joker_Filler == "Caino":
+                    joker_Filler = "Canio"
+                
+                if joker_Filler.upper() in [name.upper() for name in self.options.filler_jokers.value]:
+                    classification = ItemClassification.filler
+                    
                 # print(item_name + " with class: " + str(classification)) 
                 self.itempool.append(self.create_item(item_name, classification))
             # else: 
@@ -143,7 +151,7 @@ class BalatroWorld(World):
 
         if classification is None:
             classification = ItemClassification.filler
-
+        print("class: " + str(classification) + " for item: " + item_name)
         return BalatroItem(item_name, classification, item.code, self.player)
 
     def create_regions(self) -> None:

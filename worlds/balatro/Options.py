@@ -53,12 +53,11 @@ class FillerJokers(OptionSet):
 
         for a full list go to https://balatrogame.fandom.com/wiki/Category:Jokers
         
-
     Example: ['Abstract Joker', 'Acrobat', 'Ancient Joker']
     """
     display_name = "Set jokers as filler"
     default = []
-    valid_keys = [key for key, _ in item_table.items() if is_joker(key)]
+    valid_keys = [key for key, _ in item_table.items() if is_joker(key)] + ["Canio", "Riff-Raff"]  
 
 
 class IncludeStakes(Range):
