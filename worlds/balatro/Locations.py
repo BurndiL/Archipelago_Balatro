@@ -1,6 +1,7 @@
 from .BalatroDecks import deck_id_to_name
 from BaseClasses import Location
-from .Options import BalatroOptions
+
+max_shop_items = 150
 
 # ask what the fuck to put here lol
 offset = 5606_000
@@ -34,7 +35,7 @@ for deck in deck_id_to_name:
 shop_id_offset = prev_id+1
 
 for j in range(8):
-    for i in range(50):
+    for i in range(max_shop_items):
         
         prev_id += 1
         

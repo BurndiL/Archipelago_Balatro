@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from enum import IntEnum
 from typing import TypedDict
 from .Items import item_table, is_joker
+from .Locations import max_shop_items
 from Options import DefaultOnToggle, OptionSet, PerGameCommonOptions, Toggle, Range, Choice
 
 class Goal(Choice):
@@ -76,10 +77,10 @@ class ShopItems(Range):
     So for example if you include 3 Stakes and set this option to 11, then there 
     will be 33 findable Shop Items in your game.
     minimum value: 0
-    maximum value: 50""" 
+    maximum value: 150""" 
     display_name = "Number of AP shop Items"
     range_start = 0
-    range_end = 50
+    range_end = max_shop_items
     default = 10
 
 

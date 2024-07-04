@@ -11,7 +11,7 @@ import random
 from worlds.generic.Rules import add_rule
 from .Options import BalatroOptions
 from .Locations import BalatroLocation, balatro_location_id_to_name, balatro_location_name_to_id, \
-    balatro_location_id_to_stake, shop_id_offset, balatro_location_id_to_ante
+    balatro_location_id_to_stake, shop_id_offset, balatro_location_id_to_ante, max_shop_items
 
 
 class BalatroWebWorld(WebWorld):
@@ -198,7 +198,7 @@ class BalatroWorld(World):
         for i in range(self.options.include_stakes.value):
             stake = i + 1
             shop_region = Region("Shop Stake " + str(stake), self.player, self.multiworld)
-            id_offset = shop_id_offset + i*50
+            id_offset = shop_id_offset + i*max_shop_items
             
             for j in range(self.options.shop_items.value):
                 location_name = self.shop_locations[id_offset + j]
@@ -216,7 +216,8 @@ class BalatroWorld(World):
                         state.has_from_list(list(tarots.values()), self.player, (_stake_ - 1) * 2) and
                         state.has_from_list(list(spectrals.values()), self.player, (_stake_ - 1) * 2) and
                         state.has_from_list(list(planets.values()), self.player, (_stake_ - 1) * 2) and
-                        state.has_from_list(list(vouchers.values()), self.player, (_stake_ - 1) * 1))
+                        state.has_from_list(list(vouchers.values()), self.player, (_stake_ - 1) * 1) and
+                        state.has_any(list(deck_id_to_name.values()), self.player))
             
         if self.options.goal == "beat_decks":
             self.multiworld.completion_condition[self.player] = lambda state: state.has_from_list(
@@ -233,6 +234,11 @@ class BalatroWorld(World):
         return self.fill_json_data()
 
     def fill_json_data(self) -> Dict[str, Any]:
+        min_price = self.options.minimum_price.value
+        max_price = self.options.maximum_price.value
+        if min_price > max_price:
+            min_price, max_price = max_price, min_price
+        
         base_data = {
             "goal": self.options.goal.value,
             "ante_win_goal": self.options.ante_win_goal.value,
@@ -246,8 +252,8 @@ class BalatroWorld(World):
             "stake6_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__("Stake 6")],
             "stake7_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__("Stake 7")],
             "stake8_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__("Stake 8")],
-            "minimum_price": self.options.minimum_price.value,
-            "maximum_price": self.options.maximum_price.value,
+            "minimum_price": min_price,
+            "maximum_price": max_price,
             "deathlink": bool(self.options.deathlink)
         }
         return base_data
