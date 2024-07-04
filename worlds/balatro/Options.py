@@ -17,29 +17,31 @@ class Goal(Choice):
     default = option_beat_decks
 
 class BeatAnteToWin(Range):
-    """What ante you need to beat to win (if that's the selected goal), note that this can go up to 38"""
+    """What ante you need to beat to win (if that's the selected goal), note that this can go up to 38
+    This setting can be ignored if your goal isn't "beat ante" """
     display_name = "What Ante you need to beat to win"
     range_start = 1
     range_end = 38
     default = 12
 
 class DecksToWin(Range):
-    """Number of decks you need to beat to win."""
+    """Number of decks you need to beat to win.
+    This setting can be ignored if your goal isn't "beat decks" """
     display_name = "How many decks to win"
     range_start = 1
     range_end = 15
     default = 4
 
 class UnlockJokersToWin(Range):
-    """Number of jokers you need to win"""
+    """Number of jokers you need to win
+    This setting can be ignored if your goal isn't "unlock jokers" """
     display_name = "How many jokers to win"
     range_start = 1
     range_end = 150
     default = 75
 
 class FillerJokers(OptionSet):
-    """
-    Which Jokers are supposed to be filler (every Joker not in this list will be considered useful)
+    """Which Jokers are supposed to be filler (every Joker not in this list will be considered useful)
     Be careful with this option if your goal is "Unlock Jokers"
 
     Valid Jokers:
@@ -70,22 +72,30 @@ class IncludeStakes(Range):
     default = 2
 
 class ShopItems(Range):
-    """Number of AP Checks that will be buyable in the shop""" 
+    """Number of AP Items that will be buyable in the shop at each included Stake.
+    So for example if you include 3 Stakes and set this option to 11, then there 
+    will be 33 findable Shop Items in your game.
+    minimum value: 0
+    maximum value: 50""" 
     display_name = "Number of AP shop Items"
     range_start = 0
-    range_end = 60
-    default = 30
+    range_end = 50
+    default = 10
 
 
 class MinimumShopPrice(Range):
-    """The minimum price for an AP Item in the shop"""
+    """The minimum price for an AP Item in the shop
+    minimum value: 0
+    maximum value: 50"""
     display_name = "Minimum Price of AP Item in shop"
     range_start = 1
-    range_end = 30
+    range_end = 50
     default = 1
 
 class MaximumShopPrice(Range):
-    """The maximum price for an AP Item in the shop"""
+    """The maximum price for an AP Item in the shop
+    minimum value: 1
+    maximum value: 100"""
     display_name = "Maximum Price of AP Item in shop"
     range_start = 1
     range_end = 100
@@ -93,7 +103,9 @@ class MaximumShopPrice(Range):
 
 
 class DecksUnlockedFromStart(Range):
-    """Number of decks you want to start with."""
+    """Number of random decks you want to start with.
+    minimum value: 0
+    maximum value: 15"""
     display_name = "Number of starting decks"
     range_start = 0
     range_end = 15

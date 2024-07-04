@@ -321,24 +321,45 @@ item_table: Dict[str, ItemData] = {
 
 }
 
-# this might not be smart, maybe check for id range instead
 def is_deck(item_name: str) -> bool:
     return item_name.endswith("Deck")
-
-# Ranges are defined like this to increase maintainability 
-def is_useful(item_name: str) -> bool:
-    item_id = item_name_to_id[item_name] - offset
-    return (is_joker(item_name)  # Jokers should be considered useful
-        or item_id >= 166 and item_id <= 197  # Vouchers should be considered useful
-        or item_id >= 198 and item_id <= 212  # Booster Packs 
-        or item_id >= 213 and item_id <= 234  # Tarot Cards
-        or item_id >= 235 and item_id <= 246  # Planet Cards
-        or item_id >= 247 and item_id <= 264  # Spectral Cards
-    )
 
 def is_joker(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
     return (item_id >= 16 and item_id <= 165)
+
+def is_voucher(item_name: str) -> bool:
+    item_id = item_name_to_id[item_name] - offset
+    return (item_id >= 166 and item_id <= 197)
+
+def is_booster(item_name: str) -> bool:
+    item_id = item_name_to_id[item_name] - offset
+    return (item_id >= 198 and item_id <= 212)
+
+def is_tarot(item_name: str) -> bool:
+    item_id = item_name_to_id[item_name] - offset
+    return (item_id >= 213 and item_id <= 234)
+
+def is_planet(item_name: str) -> bool:
+    item_id = item_name_to_id[item_name] - offset
+    return (item_id >= 235 and item_id <= 246)
+
+def is_spectral(item_name: str) -> bool:
+    item_id = item_name_to_id[item_name] - offset
+    return (item_id >= 247 and item_id <= 264)
+
+def is_progression(item_name: str) -> bool:
+    return ( is_deck(item_name) or 
+            is_joker(item_name) or 
+            is_tarot(item_name) or 
+            is_voucher(item_name) or 
+            is_planet(item_name) or 
+            is_spectral(item_name) 
+    )
+
+def is_useful(item_name: str) -> bool:
+    return ( is_booster(item_name) 
+    )
 
 item_id_to_name: Dict[int, str] = {
     data.code: item_name for item_name, data in item_table.items() if data.code
@@ -350,4 +371,20 @@ item_name_to_id: Dict[str, int] = {
 
 jokers: Dict[int, str] = {
     data.code: item_name for item_name, data in item_table.items() if data.code and is_joker(item_name)
+}
+
+vouchers: Dict[int, str] = {
+    data.code: item_name for item_name, data in item_table.items() if data.code and is_voucher(item_name)
+}
+
+planets: Dict[int, str] = {
+    data.code: item_name for item_name, data in item_table.items() if data.code and is_planet(item_name)
+}
+
+spectrals: Dict[int, str] = {
+    data.code: item_name for item_name, data in item_table.items() if data.code and is_spectral(item_name)
+}
+
+tarots: Dict[int, str] = {
+    data.code: item_name for item_name, data in item_table.items() if data.code and is_tarot(item_name)
 }
