@@ -107,7 +107,7 @@ class BalatroWorld(World):
         elif (self.options.trap_amount == Traps.option_mayhem):
             trap_amount = 1
 
-        op_filler_max = self.options.permanent_filler.value - 1
+        op_filler_max = self.options.permanent_filler.value
         op_filler = 1
 
         while len(self.itempool) < pool_count:
