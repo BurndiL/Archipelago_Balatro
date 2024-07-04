@@ -206,6 +206,11 @@ class BalatroWorld(World):
                 new_location = BalatroLocation(self.player, location_name, location_id, shop_region)
 
                 new_location.progress_type = LocationProgressType.DEFAULT
+                
+                # balance out shop items a bit
+                add_rule(new_location, lambda state, _require_ = j / 3: 
+                state.has_from_list(list(jokers.values()), self.player, _require_))
+                
                 shop_region.locations.append(new_location)
                 self.locations_set += 1
                 
