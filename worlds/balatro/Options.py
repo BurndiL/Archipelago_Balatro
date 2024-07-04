@@ -116,6 +116,16 @@ class DecksUnlockedFromStart(Range):
 class DeathLink(Toggle):
     """When your run ends, everybody will die. When somebody else dies, your run will end."""
     display_name = "Death Link"
+    
+class OpFillerAmount(Range):
+    """The amount of permanent filler items (like "+1 Hand Size") is gonna be generated.
+    If you set this option to 3 for example its gonna make 3 "+1 Hand Size", 3 "+1 Joker Slot", etc.
+    minimum value: 0
+    maximum value: 20"""
+    display_name = "Permanent filler amount"
+    range_start = 0
+    range_end = 20
+    default = 4
 
 
 class Traps(Choice):
@@ -155,6 +165,7 @@ class BalatroOptions(PerGameCommonOptions):
     shop_items : ShopItems
     minimum_price : MinimumShopPrice
     maximum_price : MaximumShopPrice
+    permanent_filler : OpFillerAmount
 
     #traps 
     trap_amount : Traps

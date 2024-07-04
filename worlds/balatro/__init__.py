@@ -106,7 +106,7 @@ class BalatroWorld(World):
             trap_amount = 1
 
 
-        op_filler_max = 3
+        op_filler_max = self.options.permanent_filler.value - 1
         op_filler = 1
 
         while len(self.itempool) < pool_count:
