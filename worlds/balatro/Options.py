@@ -40,6 +40,19 @@ class UnlockJokersToWin(Range):
     range_start = 1
     range_end = 150
     default = 75
+    
+class ShortMode(Toggle):
+    """Short Mode was made for shorter playthroughs like syncs.
+    It greatly decreases the amount of items that Balatro needs to put in the multiworld.
+    Changes:
+    All 150 joker items are put in 15 randomly generated joker bundles
+    All tarot cards are put into 1 tarot bundle
+    All spectral cards are put into 1 spectral bundle
+    All planet cards are put into 1 planet bundle
+    
+    The other items such as decks, vouchers and booster packs remain the same."""
+    display_name = "Short Mode"
+    
 
 class FillerJokers(OptionSet):
     """Which Jokers are supposed to be filler (every Joker not in this list will be considered useful)
@@ -154,6 +167,9 @@ class BalatroOptions(PerGameCommonOptions):
     ante_win_goal : BeatAnteToWin
     decks_win_goal : DecksToWin
     jokers_unlock_goal : UnlockJokersToWin
+    
+    # short mode
+    short_mode : ShortMode
 
     # locations
     include_stakes : IncludeStakes

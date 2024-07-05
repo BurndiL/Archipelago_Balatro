@@ -317,8 +317,29 @@ item_table: Dict[str, ItemData] = {
     "Lose Hand" : ItemData(offset + 322),
     "Make Random Joker Perishable" : ItemData(offset + 323),
     "Make Random Joker Eternal" : ItemData(offset + 324),
-    "Make Random Joker Rental" : ItemData(offset + 325)
-
+    "Make Random Joker Rental" : ItemData(offset + 325),
+    
+    # Joker Bundle (for short mode)
+    "Joker Bundle 1" : ItemData(offset + 351),
+    "Joker Bundle 2" : ItemData(offset + 352),
+    "Joker Bundle 3" : ItemData(offset + 353),
+    "Joker Bundle 4" : ItemData(offset + 354),
+    "Joker Bundle 5" : ItemData(offset + 355),
+    "Joker Bundle 6" : ItemData(offset + 356),
+    "Joker Bundle 7" : ItemData(offset + 357),
+    "Joker Bundle 8" : ItemData(offset + 358),
+    "Joker Bundle 9" : ItemData(offset + 359),
+    "Joker Bundle 10" : ItemData(offset + 360),
+    "Joker Bundle 11" : ItemData(offset + 361),
+    "Joker Bundle 12" : ItemData(offset + 362),
+    "Joker Bundle 13" : ItemData(offset + 363),
+    "Joker Bundle 14" : ItemData(offset + 364),
+    "Joker Bundle 15" : ItemData(offset + 365),
+    
+    # Consumable Bundles
+    "Tarot Bundle" : ItemData(offset + 371),
+    "Planet Bundle" : ItemData(offset + 372),
+    "Spectral Bundle" : ItemData(offset + 373)
 }
 
 def is_deck(item_name: str) -> bool:
@@ -348,8 +369,17 @@ def is_spectral(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
     return (item_id >= 247 and item_id <= 264)
 
+def is_bundle(item_name: str) -> bool:
+    item_id = item_name_to_id[item_name] - offset
+    return (item_id >= 351 and item_id <= 373)
+
+def is_joker_bundle(item_name: str) -> bool:
+    item_id = item_name_to_id[item_name] - offset
+    return (item_id >= 351 and item_id <= 365)
+
+
 def is_progression(item_name: str) -> bool:
-    return ( is_deck(item_name) or 
+    return (is_deck(item_name) or 
             is_joker(item_name) or 
             is_tarot(item_name) or 
             is_voucher(item_name) or 
@@ -387,4 +417,8 @@ spectrals: Dict[int, str] = {
 
 tarots: Dict[int, str] = {
     data.code: item_name for item_name, data in item_table.items() if data.code and is_tarot(item_name)
+}
+
+joker_bundles: Dict[int, str] = {
+    data.code: item_name for item_name, data in item_table.items() if data.code and is_joker_bundle(item_name)
 }
