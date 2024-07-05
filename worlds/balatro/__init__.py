@@ -197,16 +197,20 @@ class BalatroWorld(World):
                     if ante > 4:
                         add_rule(new_location, lambda state, _ante_ = ante: 
                         state.has_from_list(list(jokers.values()), self.player, 8 + _ante_ * 2) or
-                        state.has_from_list(list(joker_bundles.values()), self.player, 3))
+                        state.has_from_list(list(joker_bundles.values()), self.player, 2))
                     
                     # limit later stakes to "require" jokers so progression is distributed better
-                    add_rule(new_location, lambda state, _stake_ = stake: 
-                        ((state.has_from_list(list(jokers.values()), self.player, (_stake_ - 1) * 12) and
-                        state.has_from_list(list(tarots.values()), self.player, (_stake_ - 1) * 2) and
-                        state.has_from_list(list(spectrals.values()), self.player, (_stake_ - 1) * 2) and
-                        state.has_from_list(list(planets.values()), self.player, (_stake_ - 1) * 2)) or 
-                        state.has_from_list(list(joker_bundles.values()), self.player, _stake_ - 1)) and
-                        state.has_from_list(list(vouchers.values()), self.player, (_stake_ - 1) * 1))
+                    if bool(self.options.short_mode):
+                        add_rule(new_location, lambda state, _stake_ = stake: 
+                            state.has_from_list(list(joker_bundles.values()), self.player, _stake_ - 1) and
+                            state.has_from_list(list(vouchers.values()), self.player, (_stake_ - 1) * 1))
+                    else: 
+                        add_rule(new_location, lambda state, _stake_ = stake: 
+                            state.has_from_list(list(jokers.values()), self.player, (_stake_ - 1) * 10) and
+                            state.has_from_list(list(tarots.values()), self.player, (_stake_ - 1) ) and
+                            state.has_from_list(list(spectrals.values()), self.player, (_stake_ - 1) ) and
+                            state.has_from_list(list(vouchers.values()), self.player, (_stake_ - 1) ))
+                        
 
                     if stake <= self.options.include_stakes:
                         self.locations_set += 1
@@ -245,14 +249,19 @@ class BalatroWorld(World):
                 self.locations_set += 1
                 
             self.multiworld.regions.append(shop_region)
-            menu_region.connect(shop_region, rule = lambda state, _stake_ = stake: 
-                ((state.has_from_list(list(jokers.values()), self.player, (_stake_ - 1) * 12) and
-                state.has_from_list(list(tarots.values()), self.player, (_stake_ - 1) * 2) and
-                state.has_from_list(list(spectrals.values()), self.player, (_stake_ - 1) * 2) and
-                state.has_from_list(list(planets.values()), self.player, (_stake_ - 1) * 2)) or 
-                state.has_from_list(list(joker_bundles.values()), self.player, _stake_-1)) and
-                state.has_from_list(list(vouchers.values()), self.player, (_stake_ - 1) * 1) and
-                state.has_any(list(deck_id_to_name.values()), self.player))
+            
+            if bool(self.options.short_mode):
+                menu_region.connect(shop_region, rule = lambda state, _stake_ = stake: 
+                    state.has_from_list(list(joker_bundles.values()), self.player, _stake_-1) and
+                    state.has_from_list(list(vouchers.values()), self.player, (_stake_ - 1)) and
+                    state.has_any(list(deck_id_to_name.values()), self.player))
+            else: 
+                menu_region.connect(shop_region, rule = lambda state, _stake_ = stake: 
+                    state.has_from_list(list(jokers.values()), self.player, (_stake_ - 1) * 10) and
+                    state.has_from_list(list(tarots.values()), self.player, (_stake_ - 1) ) and
+                    state.has_from_list(list(spectrals.values()), self.player, (_stake_ - 1) ) and
+                    state.has_from_list(list(vouchers.values()), self.player, (_stake_ - 1) ) and
+                    state.has_any(list(deck_id_to_name.values()), self.player))
             
         if self.options.goal == "beat_decks":
             self.multiworld.completion_condition[self.player] = lambda state: state.has_from_list(

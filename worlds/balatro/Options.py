@@ -50,7 +50,7 @@ class ShortMode(Toggle):
     All spectral cards are put into 1 spectral bundle
     All planet cards are put into 1 planet bundle
     
-    The other items such as decks, vouchers and booster packs remain the same."""
+    The other items such as decks, vouchers and booster packs remain individual checks."""
     display_name = "Short Mode"
     
 
@@ -76,8 +76,6 @@ class FillerJokers(OptionSet):
 class IncludeStakes(Range):
     """Number of Stakes that can contain locations:
     1 is White Stake, 2 is White and Green Stake, etc
-    minimum value: 1
-    maximum value: 8
     """
     display_name = "Include Stakes to have important Checks"
     range_start = 1
@@ -87,9 +85,7 @@ class IncludeStakes(Range):
 class ShopItems(Range):
     """Number of AP Items that will be buyable in the shop at each included Stake.
     So for example if you include 3 Stakes and set this option to 11, then there 
-    will be 33 findable Shop Items in your game.
-    minimum value: 0
-    maximum value: 150""" 
+    will be 33 findable Shop Items in your game.""" 
     display_name = "Number of AP shop Items"
     range_start = 0
     range_end = max_shop_items
@@ -97,18 +93,14 @@ class ShopItems(Range):
 
 
 class MinimumShopPrice(Range):
-    """The minimum price for an AP Item in the shop
-    minimum value: 0
-    maximum value: 50"""
+    """The minimum price for an AP Item in the shop"""
     display_name = "Minimum Price of AP Item in shop"
     range_start = 1
     range_end = 50
     default = 1
 
 class MaximumShopPrice(Range):
-    """The maximum price for an AP Item in the shop
-    minimum value: 1
-    maximum value: 100"""
+    """The maximum price for an AP Item in the shop"""
     display_name = "Maximum Price of AP Item in shop"
     range_start = 1
     range_end = 100
@@ -116,9 +108,7 @@ class MaximumShopPrice(Range):
 
 
 class DecksUnlockedFromStart(Range):
-    """Number of random decks you want to start with.
-    minimum value: 0
-    maximum value: 15"""
+    """Number of random decks you want to start with."""
     display_name = "Number of starting decks"
     range_start = 0
     range_end = 15
@@ -131,9 +121,7 @@ class DeathLink(Toggle):
     
 class OpFillerAmount(Range):
     """The amount of permanent filler items (like "+1 Hand Size") is gonna be generated.
-    If you set this option to 3 for example its gonna make 3 "+1 Hand Size", 3 "+1 Joker Slot", etc.
-    minimum value: 0
-    maximum value: 20"""
+    If you set this option to 3 for example its gonna make 3 "+1 Hand Size", 3 "+1 Joker Slot", etc."""
     display_name = "Permanent filler amount"
     range_start = 0
     range_end = 20
