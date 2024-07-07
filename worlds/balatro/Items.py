@@ -310,14 +310,21 @@ item_table: Dict[str, ItemData] = {
     "Receive Consumable Pack" : ItemData(offset + 312),
     "Plus 3 Hand Size Next Round" : ItemData(offset + 313),
     "Rerolls Start At $0 Next Shop" : ItemData(offset + 314),
+    "Free uncommon joker next shop" : ItemData(offset + 315),
+    "Free rare joker next shop" : ItemData(offset + 316),
+    "Free negative joker next shop" : ItemData(offset + 317),
+    "Free foil joker next shop" : ItemData(offset + 318),
+    "Free holographic joker next shop" : ItemData(offset + 319),
+    "Free polychrome joker next shop" : ItemData(offset + 320),
+    "Receive double tag" : ItemData(offset + 321),
 
     # Traps 
-    "Lose All Money" : ItemData(offset + 320),
-    "Lose Discard" : ItemData(offset + 321),
-    "Lose Hand" : ItemData(offset + 322),
-    "Make Random Joker Perishable" : ItemData(offset + 323),
-    "Make Random Joker Eternal" : ItemData(offset + 324),
-    "Make Random Joker Rental" : ItemData(offset + 325),
+    "Lose All Money" : ItemData(offset + 330),
+    "Lose Discard" : ItemData(offset + 331),
+    "Lose Hand" : ItemData(offset + 332),
+    "Make Random Joker Perishable" : ItemData(offset + 333),
+    "Make Random Joker Eternal" : ItemData(offset + 334),
+    "Make Random Joker Rental" : ItemData(offset + 335),
     
     # Joker Bundle (for short mode)
     "Joker Bundle 1" : ItemData(offset + 351),

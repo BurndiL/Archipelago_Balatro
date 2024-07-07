@@ -143,7 +143,7 @@ class BalatroWorld(World):
             counter += 1
 
             if (trap_amount != -1 and counter % trap_amount == 0):
-                trap_id = random.randint(320, 325)
+                trap_id = random.randint(330, 335)
                 self.itempool.append(self.create_item(item_id_to_name[trap_id + offset], ItemClassification.trap))
             else:
                 filler_id = 310
@@ -156,7 +156,7 @@ class BalatroWorld(World):
                     
                 # after all good filler items are placed, fill the rest with normal filler items
                 else:
-                    filler_id = random.randint(310, 314)
+                    filler_id = random.randint(310, 321)
 
                 self.itempool.append(self.create_item(item_id_to_name[filler_id + offset], ItemClassification.filler))
 
@@ -197,7 +197,7 @@ class BalatroWorld(World):
                     if ante > 4:
                         add_rule(new_location, lambda state, _ante_ = ante: 
                         state.has_from_list(list(jokers.values()), self.player, 8 + _ante_ * 2) or
-                        state.has_from_list(list(joker_bundles.values()), self.player, 2))
+                        state.has_from_list(list(joker_bundles.values()), self.player, _ante_))
                     
                     # limit later stakes to "require" jokers so progression is distributed better
                     if bool(self.options.short_mode):
