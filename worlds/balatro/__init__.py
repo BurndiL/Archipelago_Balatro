@@ -212,7 +212,7 @@ class BalatroWorld(World):
                             state.has_from_list(list(vouchers.values()), self.player, (_stake_ - 1) ))
                         
 
-                    if stake <= self.options.include_stakes:
+                    if str(stake) in self.options.include_stakes:
                         self.locations_set += 1
                         deck_region.locations.append(new_location)
 
@@ -228,10 +228,11 @@ class BalatroWorld(World):
             if str(location).startswith("Shop Item"):
                 self.shop_locations[balatro_location_name_to_id[location]] = location
 
-        for i in range(self.options.include_stakes.value):
-            stake = i + 1
+        for i in self.options.include_stakes.value:
+            print(str(i))
+            stake = int(i) 
             shop_region = Region("Shop Stake " + str(stake), self.player, self.multiworld)
-            id_offset = shop_id_offset + i*max_shop_items
+            id_offset = shop_id_offset + (stake - 1)*max_shop_items
             
             for j in range(self.options.shop_items.value):
                 location_name = self.shop_locations[id_offset + j]
@@ -314,6 +315,7 @@ class BalatroWorld(World):
             "jokerbundle15" : self.short_mode_pool[140:150],
             "minimum_price": min_price,
             "maximum_price": max_price,
-            "deathlink": bool(self.options.deathlink)
+            "deathlink": bool(self.options.deathlink),
+            "stakesunlocked" : bool(self.options.unlock_all_stakes)
         }
         return base_data

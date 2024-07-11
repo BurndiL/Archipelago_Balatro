@@ -73,14 +73,15 @@ class FillerJokers(OptionSet):
     valid_keys = [key for key, _ in item_table.items() if is_joker(key)] + ["Canio", "Riff-Raff"]  
 
 
-class IncludeStakes(Range):
-    """Number of Stakes that can contain locations:
-    1 is White Stake, 2 is White and Green Stake, etc
+class IncludeStakes(OptionSet):
+    """Decide which stakes should have progressive items. The other stakes will have no checks. 
+    White Stake corresponds to 1, Red Stake to 2, etc. 
+    Example: ['1','2','8']
+    This will make the locations in white, red and gold stake important.
     """
-    display_name = "Include Stakes to have important Checks"
-    range_start = 1
-    range_end = 8
-    default = 2
+    display_name = "Include Stakes to have important Locations"
+    default = ["1","2"]
+    valid_keys = ["1","2","3","4","5","6","7","8"]
 
 class ShopItems(Range):
     """Number of AP Items that will be buyable in the shop at each included Stake.
@@ -113,7 +114,10 @@ class DecksUnlockedFromStart(Range):
     range_start = 0
     range_end = 15
     default = 1
-
+    
+class UnlockAllStakes(Toggle):
+    """Turn this option on to unlock all stakes from the start."""
+    display_name = "Unlock all Stakes from start"
 
 class DeathLink(Toggle):
     """When your run ends, everybody will die. When somebody else dies, your run will end."""
@@ -159,8 +163,9 @@ class BalatroOptions(PerGameCommonOptions):
     # short mode
     short_mode : ShortMode
 
-    # locations
+    # stakes
     include_stakes : IncludeStakes
+    unlock_all_stakes : UnlockAllStakes
 
     # items
     decks_unlocked_from_start : DecksUnlockedFromStart
