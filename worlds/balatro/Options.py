@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import TypedDict
+from typing import TypedDict, Dict
+from BaseClasses import Item
 from .Items import item_table, is_joker
 from .Locations import max_shop_items
 from Options import DefaultOnToggle, OptionSet, PerGameCommonOptions, Toggle, Range, Choice
@@ -72,16 +73,25 @@ class FillerJokers(OptionSet):
     default = []
     valid_keys = [key for key, _ in item_table.items() if is_joker(key)] + ["Canio", "Riff-Raff"]  
 
+stake_to_number: Dict[str, int] = {
+    "white stake" : 1,
+    "red stake" : 2, 
+    "green stake" : 3, 
+    "black stake" : 4, 
+    "blue stake" : 5, 
+    "purple stake" : 6, 
+    "orange stake" : 7, 
+    "gold stake" : 8
+}
 
 class IncludeStakes(OptionSet):
     """Decide which stakes should have progressive items. The other stakes will have no checks. 
-    White Stake corresponds to 1, Red Stake to 2, etc. 
-    Example: ['1','2','8']
+    Example: ['white stake','red stake','gold stake']
     This will make the locations in white, red and gold stake important.
     """
     display_name = "Include Stakes to have important Locations"
-    default = ["1","2"]
-    valid_keys = ["1","2","3","4","5","6","7","8"]
+    default = ["white stake","red stake"]
+    valid_keys = [key for key, _ in stake_to_number.items()]
 
 class ShopItems(Range):
     """Number of AP Items that will be buyable in the shop at each included Stake.

@@ -9,7 +9,7 @@ from .Items import item_name_to_id, item_id_to_name, item_table, is_joker, joker
 from .BalatroDecks import deck_id_to_name
 import random, math
 from worlds.generic.Rules import add_rule
-from .Options import BalatroOptions, Traps
+from .Options import BalatroOptions, Traps, stake_to_number
 from .Locations import BalatroLocation, balatro_location_id_to_name, balatro_location_name_to_id, \
     balatro_location_id_to_stake, shop_id_offset, balatro_location_id_to_ante, max_shop_items
 
@@ -212,7 +212,7 @@ class BalatroWorld(World):
                             state.has_from_list(list(vouchers.values()), self.player, (_stake_ - 1) ))
                         
 
-                    if str(stake) in self.options.include_stakes:
+                    if stake in [stake_to_number.get(key) for key in self.options.include_stakes.value]:
                         self.locations_set += 1
                         deck_region.locations.append(new_location)
 
@@ -228,8 +228,7 @@ class BalatroWorld(World):
             if str(location).startswith("Shop Item"):
                 self.shop_locations[balatro_location_name_to_id[location]] = location
 
-        for i in self.options.include_stakes.value:
-            print(str(i))
+        for i in [stake_to_number.get(key) for key in self.options.include_stakes.value]:
             stake = int(i) 
             shop_region = Region("Shop Stake " + str(stake), self.player, self.multiworld)
             id_offset = shop_id_offset + (stake - 1)*max_shop_items
@@ -290,6 +289,7 @@ class BalatroWorld(World):
             "ante_win_goal": self.options.ante_win_goal.value,
             "decks_win_goal": self.options.decks_win_goal.value,
             "jokers_unlock_goal": self.options.jokers_unlock_goal.value,
+            "included_stakes" : [stake_to_number.get(key) for key in self.options.include_stakes.value],
             "stake1_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__("Stake 1")],
             "stake2_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__("Stake 2")],
             "stake3_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__("Stake 3")],
