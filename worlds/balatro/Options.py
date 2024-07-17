@@ -5,6 +5,7 @@ from BaseClasses import Item
 from .Items import item_table, is_joker
 from .Locations import max_shop_items
 from Options import DefaultOnToggle, OptionSet, PerGameCommonOptions, Toggle, Range, Choice
+from .BalatroDecks import deck_id_to_name
 
 class Goal(Choice):
     """Goal for this playthrough
@@ -71,7 +72,34 @@ class FillerJokers(OptionSet):
     """
     display_name = "Set jokers as filler"
     default = []
-    valid_keys = [key for key, _ in item_table.items() if is_joker(key)] + ["Canio", "Riff-Raff"]  
+    valid_keys = [key for key, _ in item_table.items() if is_joker(key)] + ["Canio", "Riff-Raff"]    
+    
+class IncludeDecks(Choice):
+    """Decide how it is determined what decks will be playable.
+    all: All decks will be playable. 
+    choose: You can choose below what decks will be playable.
+    number: You can choose how many randomly selected decks will be playable."""
+    display_name = "Playable Decks Mode"
+    option_all = 0
+    option_choose = 1
+    option_number = 2
+    default = option_all
+
+class IncludeDecksList(OptionSet):
+    """Decide which decks will be playable in the game. 
+    This option is only considered if Playable Decks is set to choose. """
+    display_name = "Include selection of playable decks"
+    default = [value for key, value in deck_id_to_name.items()]
+    valid_keys = [value for key, value in deck_id_to_name.items()]
+
+class IncludeDecksNumber(Range):
+    """Decide how many decks will be playable in the game.
+    This option is only considered if Playable Decks is set to number. """
+    display_name = "Include number of playable decks"
+    range_start = 1
+    range_end = 15
+    default = 8
+
 
 stake_to_number: Dict[str, int] = {
     "white stake" : 1,
@@ -172,6 +200,11 @@ class BalatroOptions(PerGameCommonOptions):
     
     # short mode
     short_mode : ShortMode
+
+    # decks
+    include_decks : IncludeDecks
+    include_deckChoice : IncludeDecksList
+    include_deckNumber : IncludeDecksNumber
 
     # stakes
     include_stakes : IncludeStakes
