@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import IntEnum
 from typing import TypedDict, Dict
 from BaseClasses import Item
-from .Items import item_table, is_joker
+from .Items import item_table, is_joker, stake_to_number, number_to_stake
 from .Locations import max_shop_items
 from Options import DefaultOnToggle, OptionSet, PerGameCommonOptions, Toggle, Range, Choice
 from .BalatroDecks import deck_id_to_name
@@ -55,6 +55,10 @@ class ShortMode(Toggle):
     The other items such as decks, vouchers and booster packs remain individual checks."""
     display_name = "Short Mode"
     
+    
+class RemoveOrDebuffCards(Toggle):
+    """Decide whether locked cards will not appear at all, or if they will appear but in a debuffed state. 
+    Setting this to true will remove them, setting this to false will debuff them."""
 
 class FillerJokers(OptionSet):
     """Which Jokers are supposed to be filler (every Joker not in this list will be considered useful)
@@ -74,7 +78,7 @@ class FillerJokers(OptionSet):
     default = []
     valid_keys = [key for key, _ in item_table.items() if is_joker(key)] + ["Canio", "Riff-Raff"]    
     
-class IncludeDecks(Choice):
+class IncludeDecksMode(Choice):
     """Decide how it is determined what decks will be playable.
     all: All decks will be playable. 
     choose: You can choose below what decks will be playable.
@@ -100,26 +104,48 @@ class IncludeDecksNumber(Range):
     range_end = 15
     default = 8
 
+class IncludeStakesMode(Choice):
+    """Decide how it is determined what stakes will be playable.
+    all: All stakes will be playable. 
+    choose: You can choose below what stakes will be playable.
+    number: You can choose how many randomly selected stakes will be playable."""
+    display_name = "Playable Stakes Mode"
+    option_all = 0
+    option_choose = 1
+    option_number = 2
+    default = option_number
 
-stake_to_number: Dict[str, int] = {
-    "white stake" : 1,
-    "red stake" : 2, 
-    "green stake" : 3, 
-    "black stake" : 4, 
-    "blue stake" : 5, 
-    "purple stake" : 6, 
-    "orange stake" : 7, 
-    "gold stake" : 8
-}
-
-class IncludeStakes(OptionSet):
-    """Decide which stakes should have progressive items. The other stakes will have no checks. 
-    Example: ['white stake','red stake','gold stake']
-    This will make the locations in white, red and gold stake important.
+class IncludeStakeList(OptionSet):
+    """Decide which stakes are playable. 
+    Example: ['White Stake','Red Stake','Gold Stake']
+    This will make those stakes playable and remove the other ones.
+    (Also make sure to capitalize the first letters, it's case sensitive.)
     """
     display_name = "Include Stakes to have important Locations"
-    default = ["white stake","red stake"]
+    default = ["White Stake", "Red Stake"]
     valid_keys = [key for key, _ in stake_to_number.items()]
+    
+    
+class IncludeStakesNumber(Range):
+    """Decide how many stakes will be playable in the game.
+    This option is only considered if Playable Stakes is set to number. """
+    display_name = "Include number of playable stakes"
+    range_start = 1
+    range_end = 8
+    default = 2
+
+class StakeUnlockMode(Choice):
+    """Decide how stakes are handled by the Randomizer.
+    unlocked: all stakes are unlocked from the start
+    vanilla: stakes are progressively unlocked by beating the stake before
+    stake_as_item: stakes can be found as items and unlock the stake for every deck
+    stake_as_item_per_deck: stakes can be found as items but only unlock it for a specific deck"""
+    display_name = "Stake Unlock Mode"
+    option_unlocked = 0
+    option_vanilla = 1
+    option_stake_as_item = 2
+    option_stake_as_item_per_deck = 3
+    default = option_vanilla
 
 class ShopItems(Range):
     """Number of AP Items that will be buyable in the shop at each included Stake.
@@ -152,10 +178,6 @@ class DecksUnlockedFromStart(Range):
     range_start = 0
     range_end = 15
     default = 1
-    
-class UnlockAllStakes(Toggle):
-    """Turn this option on to unlock all stakes from the start."""
-    display_name = "Unlock all Stakes from start"
 
 class DeathLink(Toggle):
     """When your run ends, everybody will die. When somebody else dies, your run will end."""
@@ -189,8 +211,6 @@ class Traps(Choice):
 
 @dataclass
 class BalatroOptions(PerGameCommonOptions):
-    # deathlink
-    deathlink: DeathLink
 
     # goal
     goal: Goal
@@ -200,18 +220,26 @@ class BalatroOptions(PerGameCommonOptions):
     
     # short mode
     short_mode : ShortMode
-
+    
+    # modifiers
+    remove_or_debuff : RemoveOrDebuffCards
+    
+    # deathlink
+    deathlink: DeathLink
+    
     # decks
-    include_decks : IncludeDecks
+    include_decksMode : IncludeDecksMode
     include_deckChoice : IncludeDecksList
     include_deckNumber : IncludeDecksNumber
+    decks_unlocked_from_start : DecksUnlockedFromStart
 
     # stakes
-    include_stakes : IncludeStakes
-    unlock_all_stakes : UnlockAllStakes
+    stake_unlock_mode : StakeUnlockMode
+    include_stakesMode : IncludeStakesMode
+    include_stakesList : IncludeStakeList
+    include_stakesNumber : IncludeStakesNumber
 
     # items
-    decks_unlocked_from_start : DecksUnlockedFromStart
     filler_jokers : FillerJokers
     shop_items : ShopItems
     minimum_price : MinimumShopPrice

@@ -1,4 +1,5 @@
 from .BalatroDecks import deck_id_to_name
+from .Items import number_to_stake
 from BaseClasses import Location
 
 max_shop_items = 150
@@ -22,7 +23,7 @@ prev_id = offset
 for deck in deck_id_to_name:
     for ante in range(8):
         for stake in range(8):
-            location_name = deck_id_to_name[deck] + " Ante " + str(ante+1) + " Stake " + str(stake + 1)
+            location_name = deck_id_to_name[deck] + " Ante " + str(ante+1) + " " + number_to_stake[stake+1]
             location_id = prev_id
             prev_id += 1
             balatro_location_name_to_id[location_name] = location_id
@@ -39,7 +40,7 @@ for j in range(8):
         
         prev_id += 1
         
-        location_name = "Shop Item " + str(i+1) + " at Stake "+ str(j+1)
+        location_name = "Shop Item " + str(i+1) + " at " + number_to_stake[j+1]
         location_id = prev_id
         
         balatro_location_name_to_id[location_name] = location_id

@@ -346,11 +346,56 @@ item_table: Dict[str, ItemData] = {
     # Consumable Bundles
     "Tarot Bundle" : ItemData(offset + 371),
     "Planet Bundle" : ItemData(offset + 372),
-    "Spectral Bundle" : ItemData(offset + 373)
+    "Spectral Bundle" : ItemData(offset + 373),
+    
+    # Stakes as Items
+    "White Stake" : ItemData(offset + 390),
+    "Red Stake" : ItemData(offset + 391),
+    "Green Stake" : ItemData(offset + 392),
+    "Black Stake" : ItemData(offset + 393),
+    "Blue Stake" : ItemData(offset + 394),
+    "Purple Stake" : ItemData(offset + 395),
+    "Orange Stake" : ItemData(offset + 396),
+    "Gold Stake" : ItemData(offset + 397),   
+}
+
+stake_to_number: Dict[str, int] = {
+    "White Stake" : 1,
+    "Red Stake" : 2, 
+    "Green Stake" : 3, 
+    "Black Stake" : 4, 
+    "Blue Stake" : 5, 
+    "Purple Stake" : 6, 
+    "Orange Stake" : 7, 
+    "Gold Stake" : 8
+}
+
+number_to_stake: Dict[int, str] = {
+    1 : "White Stake",
+    2 : "Red Stake", 
+    3: "Green Stake", 
+    4: "Black Stake" , 
+    5: "Blue Stake" , 
+    6: "Purple Stake" , 
+    7: "Orange Stake" , 
+    8: "Gold Stake"
 }
 
 def is_deck(item_name: str) -> bool:
     return item_name.endswith("Deck")
+
+decks: Dict[int, str] = {
+    data.code: item_name for item_name, data in item_table.items() if data.code and is_deck(item_name)
+}
+
+prev_id = 400
+for deck in decks.values():
+    for stake in [key for key, _ in stake_to_number.items()]:
+        item_table[str(deck) + " " + str(stake)] = ItemData(offset + prev_id)
+        prev_id += 1
+
+
+
 
 def is_joker(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
@@ -384,6 +429,15 @@ def is_joker_bundle(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
     return (item_id >= 351 and item_id <= 365)
 
+def is_stake(item_name: str) -> bool:
+    item_id = item_name_to_id[item_name] - offset
+    return (item_id >= 390 and item_id <= 397)
+
+def is_stake_per_deck(item_name: str) -> bool:
+    item_id = item_name_to_id[item_name] - offset
+    return (item_id >= 400 and item_id <= 520)
+
+
 
 def is_progression(item_name: str) -> bool:
     return (is_deck(item_name) or 
@@ -391,12 +445,14 @@ def is_progression(item_name: str) -> bool:
             is_tarot(item_name) or 
             is_voucher(item_name) or 
             is_planet(item_name) or 
-            is_spectral(item_name) 
+            is_spectral(item_name) or 
+            is_stake(item_name) or
+            is_stake_per_deck(item_name) or
+            is_booster(item_name)
     )
 
 def is_useful(item_name: str) -> bool:
-    return ( is_booster(item_name) 
-    )
+    return False # maybe we will find a useful items in the future
 
 item_id_to_name: Dict[int, str] = {
     data.code: item_name for item_name, data in item_table.items() if data.code
@@ -406,9 +462,6 @@ item_name_to_id: Dict[str, int] = {
     item_name: data.code for item_name, data in item_table.items() if data.code
 }
 
-decks: Dict[int, str] = {
-    data.code: item_name for item_name, data in item_table.items() if data.code and is_deck(item_name)
-}
 
 jokers: Dict[int, str] = {
     data.code: item_name for item_name, data in item_table.items() if data.code and is_joker(item_name)
