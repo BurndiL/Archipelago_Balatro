@@ -395,8 +395,6 @@ for deck in decks.values():
         prev_id += 1
 
 
-
-
 def is_joker(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
     return (item_id >= 16 and item_id <= 165)
