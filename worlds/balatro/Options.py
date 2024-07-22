@@ -4,7 +4,7 @@ from typing import TypedDict, Dict
 from BaseClasses import Item
 from .Items import item_table, is_joker, stake_to_number, number_to_stake
 from .Locations import max_shop_items
-from Options import DefaultOnToggle, OptionSet, PerGameCommonOptions, Toggle, Range, Choice
+from Options import DefaultOnToggle, OptionSet, PerGameCommonOptions, Toggle, Range, Choice, Option
 from .BalatroDecks import deck_id_to_name
 
 class Goal(Choice):
@@ -12,11 +12,15 @@ class Goal(Choice):
         Beat Decks: Beat Ante 8 for the specified number of decks
         Unlock Jokers: Unlock the specified amount of Jokers
         Beat Ante: Beat the specified Ante to reach the goal, can be higher than 8
+        Beat Decks on Stake: The same as beat decks, but you have to beat them on a specific stake.
+        Win with jokers on stake: Win with a specified amount of jokers on a specified stake.
     """
     display_name = "Goal"
     option_beat_decks = 0
     option_unlock_jokers = 1
     option_beat_ante = 2
+    option_beat_decks_on_stake = 3
+    option_win_with_jokers_on_stake = 4 
     default = option_beat_decks
 
 class BeatAnteToWin(Range):
@@ -29,19 +33,27 @@ class BeatAnteToWin(Range):
 
 class DecksToWin(Range):
     """Number of decks you need to beat to win.
-    This setting can be ignored if your goal isn't "beat decks" """
+    This setting can be ignored if your goal isn't "beat decks" or "beat decks on stake" """
     display_name = "How many decks to win"
     range_start = 1
     range_end = 15
     default = 4
 
-class UnlockJokersToWin(Range):
+class JokerGoal(Range):
     """Number of jokers you need to win
-    This setting can be ignored if your goal isn't "unlock jokers" """
+    This setting can be ignored if your goal isn't "unlock jokers" or "Win with jokers on stake" """
     display_name = "How many jokers to win"
     range_start = 1
     range_end = 150
     default = 75
+    
+class RequiredStakeForGoal(OptionSet):
+    """The required stake for your goal.
+    This setting can be ignored if your goal isn't "Win with jokers on stake" or "beat decks on stake" 
+    If the stake specified is not in the playable stakes it will default to the highest one."""
+    display_name = "Required Stake for goal"
+    default = ['White Stake']
+    valid_keys = [key for key, _ in stake_to_number.items()]
     
 class ShortMode(Toggle):
     """Short Mode was made for shorter playthroughs like syncs.
@@ -216,7 +228,8 @@ class BalatroOptions(PerGameCommonOptions):
     goal: Goal
     ante_win_goal : BeatAnteToWin
     decks_win_goal : DecksToWin
-    jokers_unlock_goal : UnlockJokersToWin
+    jokers_unlock_goal : JokerGoal
+    required_stake_for_goal : RequiredStakeForGoal
     
     # short mode
     short_mode : ShortMode

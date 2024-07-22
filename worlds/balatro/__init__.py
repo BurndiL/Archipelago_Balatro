@@ -53,6 +53,7 @@ class BalatroWorld(World):
     
     playable_decks = [value for _, value in deck_id_to_name.items()]
     playable_stakes = list([value for _, value in number_to_stake.items()])
+    required_stake = "White Stake"
 
     short_mode_pool = list(jokers.keys())
     random.shuffle(short_mode_pool)    
@@ -81,6 +82,12 @@ class BalatroWorld(World):
             self.playable_stakes = playable_stake_choice[0:self.options.include_stakesNumber.value]
         elif self.options.include_stakesMode == IncludeStakesMode.option_choose:
             self.playable_stakes = list(self.options.include_stakesList.value)
+            
+        
+        if list(self.options.required_stake_for_goal.value)[0] in self.playable_stakes:
+            self.required_stake = list(self.options.required_stake_for_goal.value)[0]
+        else:
+            self.required_stake = self.playable_stakes[0]
 
     def create_items(self):
         decks_to_unlock = self.options.decks_unlocked_from_start.value
@@ -336,17 +343,43 @@ class BalatroWorld(World):
                     (self.options.stake_unlock_mode != StakeUnlockMode.option_stake_as_item or state.has(number_to_stake[_stake_], self.player)) and
                     (self.options.stake_unlock_mode != StakeUnlockMode.option_stake_as_item_per_deck or state.has_from_list(_decklist_, self.player, 1)))
             
-        if self.options.goal == "beat_decks":
+            
+            
+            
+        stake_as_item_per_deck_list = list()
+        if self.options.stake_unlock_mode == StakeUnlockMode.option_stake_as_item_per_deck:
+            play_decks = self.playable_decks.copy()
+            random.shuffle(play_decks)
+            stake_as_item_per_deck_list = list([key + " " + self.required_stake for key in play_decks][0:self.options.decks_win_goal.value])
+            
+        if self.options.goal.value == Options.Goal.option_beat_decks:
             self.multiworld.completion_condition[self.player] = lambda state: state.has_from_list(
-                list(deck_id_to_name.values()), self.player, self.options.decks_win_goal.value)
-        elif self.options.goal == "unlock_jokers":
+                list(deck_id_to_name.values()), self.player, self.options.decks_win_goal.value) or \
+                (self.options.stake_unlock_mode == StakeUnlockMode.option_stake_as_item_per_deck and state.has_all(stake_as_item_per_deck_list, self.player))
+            
+        elif self.options.goal.value == Options.Goal.option_unlock_jokers:
             self.multiworld.completion_condition[self.player] = lambda state: state.has_from_list(list(jokers.values()),
                                                                                 self.player,
                                                                                 self.options.jokers_unlock_goal.value) or  \
             state.has_from_list(list(joker_bundles.values()), self.player, math.ceil(self.options.jokers_unlock_goal.value / 10))
-        elif self.options.goal == "beat_ante":
+            
+        elif self.options.goal.value == Options.Goal.option_beat_ante:
             self.multiworld.completion_condition[self.player] = lambda state: state.has_any(
                 list(deck_id_to_name.values()), self.player)
+            
+        elif self.options.goal.value == Options.Goal.option_beat_decks_on_stake:
+            self.multiworld.completion_condition[self.player] = lambda state: (state.has_from_list(
+                list(deck_id_to_name.values()), self.player, self.options.decks_win_goal.value) and self.options.stake_unlock_mode != StakeUnlockMode.option_stake_as_item) or \
+                (self.options.stake_unlock_mode == StakeUnlockMode.option_stake_as_item and state.has(self.required_stake, self.player) and state.has_from_list(
+                list(deck_id_to_name.values()), self.player, self.options.decks_win_goal.value)) or \
+                (self.options.stake_unlock_mode == StakeUnlockMode.option_stake_as_item_per_deck and state.has_all(stake_as_item_per_deck_list, self.player))
+        elif self.options.goal.value == Options.Goal.option_win_with_jokers_on_stake:
+            self.multiworld.completion_condition[self.player] = lambda state: state.has_from_list(list(jokers.values()),
+                                                                                self.player,
+                                                                                self.options.jokers_unlock_goal.value) or  \
+            state.has_from_list(list(joker_bundles.values()), self.player, math.ceil(self.options.jokers_unlock_goal.value / 10)) and \
+                (self.options.stake_unlock_mode != StakeUnlockMode.option_stake_as_item or state.has(self.required_stake, self.player)) and \
+                (self.options.stake_unlock_mode != StakeUnlockMode.option_stake_as_item_per_deck or state.has_any(stake_as_item_per_deck_list, self.player))
 
     def fill_slot_data(self) -> Dict[str, Any]:
         return self.fill_json_data()
@@ -362,16 +395,17 @@ class BalatroWorld(World):
             "ante_win_goal": self.options.ante_win_goal.value,
             "decks_win_goal": self.options.decks_win_goal.value,
             "jokers_unlock_goal": self.options.jokers_unlock_goal.value,
+            "required_stake" : stake_to_number[self.required_stake],
             "included_stakes" : [stake_to_number.get(key) for key in self.playable_stakes],
             "included_decks" : [deck_name_to_key.get(key) for key in self.playable_decks],
-            "stake1_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__("Stake 1")],
-            "stake2_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__("Stake 2")],
-            "stake3_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__("Stake 3")],
-            "stake4_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__("Stake 4")],
-            "stake5_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__("Stake 5")],
-            "stake6_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__("Stake 6")],
-            "stake7_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__("Stake 7")],
-            "stake8_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__("Stake 8")],
+            "stake1_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[1])],
+            "stake2_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[2])],
+            "stake3_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[3])],
+            "stake4_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[4])],
+            "stake5_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[5])],
+            "stake6_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[6])],
+            "stake7_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[7])],
+            "stake8_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[8])],
             "jokerbundle1" : self.short_mode_pool[0:10],
             "jokerbundle2" : self.short_mode_pool[10:20],
             "jokerbundle3" : self.short_mode_pool[20:30],
