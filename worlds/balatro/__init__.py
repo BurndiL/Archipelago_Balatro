@@ -425,6 +425,6 @@ class BalatroWorld(World):
             "maximum_price": max_price,
             "deathlink": bool(self.options.deathlink),
             "stake_unlock_mode" : self.options.stake_unlock_mode.value,
-            "remove_cards" : bool(self.options.remove_or_debuff)
+            # "remove_cards" : bool(self.options.remove_or_debuff)
         }
         return base_data
