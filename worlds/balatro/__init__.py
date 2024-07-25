@@ -130,14 +130,14 @@ class BalatroWorld(World):
                     self.multiworld.push_precollected(preCollected_stake)
                     excludedItems[stake_name] = stake_data
 
-
-        print(excludedItems)
         self.itempool = []
         for item_name in item_table:
 
             if (is_stake(item_name) and (not self.options.stake_unlock_mode == StakeUnlockMode.option_stake_as_item or not item_name in self.playable_stakes)):
                 continue
-            if (is_stake_per_deck(item_name) and (not self.options.stake_unlock_mode == StakeUnlockMode.option_stake_as_item_per_deck or not item_name.split()[-2] + " " + item_name.split()[-1] in self.playable_stakes)):
+            if (is_stake_per_deck(item_name) and (not self.options.stake_unlock_mode == StakeUnlockMode.option_stake_as_item_per_deck or 
+                                                  (not item_name.split()[-2] + " " + item_name.split()[-1] in self.playable_stakes or 
+                                                   not item_name.split()[0] + " " + item_name.split()[1] in self.playable_decks))):
                 continue
       
             if not bool(self.options.short_mode):
@@ -425,6 +425,7 @@ class BalatroWorld(World):
             "maximum_price": max_price,
             "deathlink": bool(self.options.deathlink),
             "stake_unlock_mode" : self.options.stake_unlock_mode.value,
-            # "remove_cards" : bool(self.options.remove_or_debuff)
+            "remove_jokers" : bool(self.options.remove_or_debuff_jokers),
+            "remove_consumables" : bool(self.options.remove_or_debuff_consumables),
         }
         return base_data

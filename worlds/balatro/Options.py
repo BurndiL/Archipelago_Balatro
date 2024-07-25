@@ -68,9 +68,15 @@ class ShortMode(Toggle):
     display_name = "Short Mode"
     
     
-# class RemoveOrDebuffCards(Toggle):
-#     """Decide whether locked cards will not appear at all, or if they will appear but in a debuffed state. 
-#     Setting this to true will remove them, setting this to false will debuff them."""
+class RemoveOrDebuffJokers(Toggle):
+    """Decide whether locked jokers will not appear at all, or if they will appear but in a debuffed state. 
+    Setting this to true will remove them, setting this to false will debuff them."""
+    
+class RemoveOrDebuffConsumables(Toggle):
+    """Decide whether locked consumables will not appear at all, or if they will appear but in a debuffed state. 
+    Setting this to true will remove them, setting this to false will debuff them."""
+
+ 
 
 class FillerJokers(OptionSet):
     """Which Jokers are supposed to be filler (every Joker not in this list will be considered useful)
@@ -235,7 +241,8 @@ class BalatroOptions(PerGameCommonOptions):
     short_mode : ShortMode
     
     # modifiers
-    # remove_or_debuff : RemoveOrDebuffCards
+    remove_or_debuff_jokers : RemoveOrDebuffJokers
+    remove_or_debuff_consumables : RemoveOrDebuffConsumables
     
     # deathlink
     deathlink: DeathLink
