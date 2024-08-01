@@ -55,17 +55,32 @@ class RequiredStakeForGoal(OptionSet):
     default = ['White Stake']
     valid_keys = [key for key, _ in stake_to_number.items()]
     
-class ShortMode(Toggle):
-    """Short Mode was made for shorter playthroughs like syncs.
-    It greatly decreases the amount of items that Balatro needs to put in the multiworld.
-    Changes:
-    All 150 joker items are put in 15 randomly generated joker bundles
-    All tarot cards are put into 1 tarot bundle
-    All spectral cards are put into 1 spectral bundle
-    All planet cards are put into 1 planet bundle
+class JokerBundles(Toggle):
+    """Instead of making every joker an individual item, you have the option to put them into bundles, 
+    resulting in faster progress and less items that need to be placed in the world.
+    If set to true: All 150 joker items are put in 15 randomly generated joker bundles."""
+    display_name = "Joker Bundles"
     
-    The other items such as decks, vouchers and booster packs remain individual checks."""
-    display_name = "Short Mode"
+    
+class TarotBundle(Toggle):
+    """Instead of making every tarot card an individual item, you have the option to put them all in one bundle, 
+    that gets placed in the world.
+    If set to true: All tarot cards are put into 1 tarot bundle"""
+    display_name = "Tarot Bundle"
+    
+    
+class PlanetBundle(Toggle):
+    """Instead of making every planet card an individual item, you have the option to put them all in one bundle, 
+    that gets placed in the world.
+    If set to true: All planet cards are put into 1 planet bundle"""
+    display_name = "Planet Bundle"
+    
+    
+class SpectralBundle(Toggle):
+    """Instead of making every spectral card an individual item, you have the option to put them all in one bundle, 
+    that gets placed in the world.
+    If set to true: All spectral cards are put into 1 spectral bundle"""
+    display_name = "Spectral Bundle"
     
     
 class RemoveOrDebuffJokers(Toggle):
@@ -172,7 +187,7 @@ class ShopItems(Range):
     display_name = "Number of AP shop Items"
     range_start = 0
     range_end = max_shop_items
-    default = 10
+    default = 15
 
 
 class MinimumShopPrice(Range):
@@ -237,10 +252,12 @@ class BalatroOptions(PerGameCommonOptions):
     jokers_unlock_goal : JokerGoal
     required_stake_for_goal : RequiredStakeForGoal
     
-    # short mode
-    short_mode : ShortMode
-    
     # modifiers
+    joker_bundles : JokerBundles
+    tarot_bundle : TarotBundle
+    planet_bundle : PlanetBundle
+    spectral_bundle : SpectralBundle
+    
     remove_or_debuff_jokers : RemoveOrDebuffJokers
     remove_or_debuff_consumables : RemoveOrDebuffConsumables
     

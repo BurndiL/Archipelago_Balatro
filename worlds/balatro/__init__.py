@@ -4,9 +4,9 @@ from typing import Any, Dict, List, Union
 
 from BaseClasses import ItemClassification, Region, Tutorial, LocationProgressType
 from ..AutoWorld import WebWorld, World
-from .Items import item_name_to_id, item_id_to_name, item_table, is_joker, jokers, decks, joker_bundles, offset, ItemData, BalatroItem, \
+from .Items import item_name_to_id, item_id_to_name, item_table, is_joker, is_joker_bundle, jokers, decks, joker_bundles, offset, ItemData, BalatroItem, \
     is_deck, is_progression, is_useful, is_bundle, tarots, planets, vouchers, spectrals, is_voucher, is_booster, is_stake, is_stake_per_deck, \
-        stake_to_number, number_to_stake
+        stake_to_number, number_to_stake, is_tarot, is_planet, is_spectral
 from .BalatroDecks import deck_id_to_name, deck_name_to_key
 import random, math
 from worlds.generic.Rules import add_rule
@@ -82,7 +82,7 @@ class BalatroWorld(World):
             self.playable_stakes = playable_stake_choice[0:self.options.include_stakesNumber.value]
         elif self.options.include_stakesMode == IncludeStakesMode.option_choose:
             self.playable_stakes = list(self.options.include_stakesList.value)
-            
+        
         
         if list(self.options.required_stake_for_goal.value)[0] in self.playable_stakes:
             self.required_stake = list(self.options.required_stake_for_goal.value)[0]
@@ -91,7 +91,7 @@ class BalatroWorld(World):
 
     def create_items(self):
         decks_to_unlock = self.options.decks_unlocked_from_start.value
-            
+                    
         if decks_to_unlock > len(self.playable_decks):
             decks_to_unlock = len(self.playable_decks)
         
@@ -139,8 +139,28 @@ class BalatroWorld(World):
                                                   (not item_name.split()[-2] + " " + item_name.split()[-1] in self.playable_stakes or 
                                                    not item_name.split()[0] + " " + item_name.split()[1] in self.playable_decks))):
                 continue
-      
-            if not bool(self.options.short_mode):
+            
+            if (self.options.tarot_bundle and is_tarot(item_name)):
+                continue
+            if (not self.options.tarot_bundle and item_name == "Tarot Bundle"):
+                continue
+            
+            if (self.options.planet_bundle and is_planet(item_name)):
+                continue
+            if (not self.options.planet_bundle and item_name == "Planet Bundle"):
+                continue
+            
+            if (self.options.spectral_bundle and is_spectral(item_name)):
+                continue
+            if (not self.options.spectral_bundle and item_name == "Spectral Bundle"):
+                continue         
+                
+            if (self.options.joker_bundles and is_joker(item_name)):
+                continue
+            if (not self.options.joker_bundles and is_joker_bundle(item_name)):
+                continue         
+            
+            if not bool(self.options.joker_bundles):
                 classification = ItemClassification.filler
                 if is_progression(item_name):
                     classification = ItemClassification.progression
@@ -148,7 +168,6 @@ class BalatroWorld(World):
                     classification = ItemClassification.useful
 
                 if not item_name in excludedItems and \
-                    (not (is_deck(item_name) and item_name in self.playable_decks)) and \
                     (not (is_deck(item_name) and self.options.stake_unlock_mode == StakeUnlockMode.option_stake_as_item_per_deck)) and \
                     (classification == ItemClassification.progression or \
                     classification == ItemClassification.useful):
@@ -258,25 +277,17 @@ class BalatroWorld(World):
                         new_location.progress_type = LocationProgressType.DEFAULT
                         
                         # to make life easier for players require some jokers to be found to beat ante 4 and up!
-                        if ante >= 4:
-                            add_rule(new_location, lambda state, _ante_ = ante: 
-                            (state.has_from_list(list(jokers.values()), self.player, 8 + _ante_ * 2) or
-                            state.has_from_list(list(joker_bundles.values()), self.player, _ante_)) and 
-                            state.has("Buffoon Pack", self.player))
+                        if ante > 4:
+                            add_rule(new_location, lambda state, _ante_ = ante: state.has_from_list(list(jokers.values()), self.player, 5 + _ante_ * 2) or state.has_from_list(list(joker_bundles.values()), self.player, _ante_))
+                            add_rule(new_location, lambda state: state.has_from_list(list(['Buffoon Pack', 'Jumbo Buffoon Pack', 'Mega Buffoon Pack']), self.player, 1))
                         
                         # limit later stakes to "require" jokers so progression is distributed better
                         
                         if ante > 2:
-                            if bool(self.options.short_mode):
-                                add_rule(new_location, lambda state, _stake_ = stake: 
-                                    state.has_from_list(list(joker_bundles.values()), self.player, _stake_ - 2) and
-                                    state.has_from_list(list(vouchers.values()), self.player, _stake_ - 3))
-                            else: 
-                                add_rule(new_location, lambda state, _stake_ = stake: 
-                                    state.has_from_list(list(jokers.values()), self.player, (_stake_ - 2) * 10) and
-                                    state.has_from_list(list(tarots.values()), self.player, (_stake_ - 3) ) and
-                                    state.has_from_list(list(spectrals.values()), self.player, (_stake_ - 3) ) and
-                                    state.has_from_list(list(vouchers.values()), self.player, (_stake_ - 3) ))
+                            add_rule(new_location, lambda state, _stake_ = stake: 
+                                (state.has_from_list(list(joker_bundles.values()), self.player, _stake_ - 2) or
+                                    state.has_from_list(list(jokers.values()), self.player, (_stake_ - 2) * 5)) and
+                                    state.has_from_list(list(vouchers.values()), self.player, _stake_ - 2))
                             
                         if self.options.stake_unlock_mode == StakeUnlockMode.option_stake_as_item:
                             add_rule(new_location, lambda state, _stake_ = stake: state.has(number_to_stake[_stake_], self.player))
@@ -291,11 +302,10 @@ class BalatroWorld(World):
                 self.multiworld.regions.append(deck_region)
                 # has to have deck collected to access it
                 menu_region.connect(deck_region, None,
-                                lambda state, _deck_name_ = deck_name: state.has(_deck_name_, self.player) or 
+                                lambda state, _deck_name_ = deck_name: state.has(_deck_name_, self.player) or
                                 state.has_from_list(list([key for key, _ in item_table.items() if is_stake_per_deck(key) and key.startswith(_deck_name_)]), self.player, 1))
         
         # Shop Region
-        
         for location in balatro_location_name_to_id:
             if str(location).startswith("Shop Item"):
                 self.shop_locations[balatro_location_name_to_id[location]] = location
@@ -317,7 +327,7 @@ class BalatroWorld(World):
                 new_location.progress_type = LocationProgressType.DEFAULT
                 
                 # balance out shop items a bit
-                if not bool(self.options.short_mode):
+                if not bool(self.options.joker_bundles):
                     add_rule(new_location, lambda state, _require_ = j / 3: 
                     state.has_from_list(list(jokers.values()), self.player, _require_))
                 
@@ -326,7 +336,7 @@ class BalatroWorld(World):
                 
             self.multiworld.regions.append(shop_region)
             
-            if bool(self.options.short_mode):
+            if bool(self.options.joker_bundles):
                 menu_region.connect(shop_region, rule = lambda state, _stake_ = stake, _decklist_ = list_of_decks_with_stake_attached: 
                     state.has_from_list(list(joker_bundles.values()), self.player, _stake_-1) and
                     state.has_from_list(list(vouchers.values()), self.player, (_stake_ - 1)) and
@@ -336,16 +346,13 @@ class BalatroWorld(World):
             else: 
                 menu_region.connect(shop_region, rule = lambda state, _stake_ = stake, _decklist_ = list_of_decks_with_stake_attached: 
                     state.has_from_list(list(jokers.values()), self.player, (_stake_ - 1) * 10) and
-                    state.has_from_list(list(tarots.values()), self.player, (_stake_ - 1) ) and
-                    state.has_from_list(list(spectrals.values()), self.player, (_stake_ - 1) ) and
-                    state.has_from_list(list(vouchers.values()), self.player, (_stake_ - 1) ) and
                     (self.options.stake_unlock_mode == StakeUnlockMode.option_stake_as_item_per_deck or state.has_any(list(deck_id_to_name.values()), self.player)) and
                     (self.options.stake_unlock_mode != StakeUnlockMode.option_stake_as_item or state.has(number_to_stake[_stake_], self.player)) and
                     (self.options.stake_unlock_mode != StakeUnlockMode.option_stake_as_item_per_deck or state.has_from_list(_decklist_, self.player, 1)))
             
             
             
-            
+        # GOALS 
         stake_as_item_per_deck_list = list()
         if self.options.stake_unlock_mode == StakeUnlockMode.option_stake_as_item_per_deck:
             play_decks = self.playable_decks.copy()
@@ -353,8 +360,8 @@ class BalatroWorld(World):
             stake_as_item_per_deck_list = list([key + " " + self.required_stake for key in play_decks][0:self.options.decks_win_goal.value])
             
         if self.options.goal.value == Options.Goal.option_beat_decks:
-            self.multiworld.completion_condition[self.player] = lambda state: state.has_from_list(
-                list(deck_id_to_name.values()), self.player, self.options.decks_win_goal.value) or \
+            self.multiworld.completion_condition[self.player] = lambda state: (state.has_from_list(
+                list(deck_id_to_name.values()), self.player, self.options.decks_win_goal.value)) or  \
                 (self.options.stake_unlock_mode == StakeUnlockMode.option_stake_as_item_per_deck and state.has_all(stake_as_item_per_deck_list, self.player))
             
         elif self.options.goal.value == Options.Goal.option_unlock_jokers:

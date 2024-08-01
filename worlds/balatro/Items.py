@@ -183,38 +183,38 @@ item_table: Dict[str, ItemData] = {
     "Perkeo": ItemData(offset + 165),
 
     # Vouchers
-    "Overstock": ItemData(offset + 166),
-    "Clearance Sale": ItemData(offset + 167),
-    "Hone": ItemData(offset + 168),
-    "Reroll Surplus": ItemData(offset + 169),
-    "Crystal Ball": ItemData(offset + 170),
-    "Telescope": ItemData(offset + 171),
-    "Grabber": ItemData(offset + 172),
-    "Wasteful": ItemData(offset + 173),
-    "Tarot Merchant": ItemData(offset + 174),
-    "Planet Merchant": ItemData(offset + 175),
-    "Seed Money": ItemData(offset + 176),
-    "Blank": ItemData(offset + 177),
-    "Magic Trick": ItemData(offset + 178),
-    "Hieroglyph": ItemData(offset + 179),
-    "Director's Cut": ItemData(offset + 180),
-    "Paint Brush": ItemData(offset + 181),
-    "Overstock Plus": ItemData(offset + 182),
-    "Liquidation": ItemData(offset + 183),
-    "Glow Up": ItemData(offset + 184),
-    "Reroll Glut": ItemData(offset + 185),
-    "Omen Globe": ItemData(offset + 186),
-    "Observatory": ItemData(offset + 187),
-    "Nacho Tong": ItemData(offset + 188),
-    "Recyclomancy": ItemData(offset + 189),
-    "Tarot Tycoon": ItemData(offset + 190),
-    "Planet Tycoon": ItemData(offset + 191),
-    "Money Tree": ItemData(offset + 192),
-    "Antimatter": ItemData(offset + 193),
-    "Illusion": ItemData(offset + 194),
-    "Petroglyph": ItemData(offset + 195),
-    "Retcon": ItemData(offset + 196),
-    "Palette": ItemData(offset + 197),
+    "Overstock/Overstock Plus": ItemData(offset + 166),
+    "Clearance Sale/Liquidation": ItemData(offset + 167),
+    "Hone/Glow Up": ItemData(offset + 168),
+    "Reroll Surplus/Reroll Glut": ItemData(offset + 169),
+    "Crystal Ball/Omen Globe": ItemData(offset + 170),
+    "Telescope/Observatory": ItemData(offset + 171),
+    "Grabber/Nacho Tong": ItemData(offset + 172),
+    "Wasteful/Recyclomancy": ItemData(offset + 173),
+    "Tarot Merchant/Tarot Tycoon": ItemData(offset + 174),
+    "Planet Merchant/Planet Tycoon": ItemData(offset + 175),
+    "Seed Money/Money Tree": ItemData(offset + 176),
+    "Blank/Antimatter": ItemData(offset + 177),
+    "Magic Trick/Illusion": ItemData(offset + 178),
+    "Hieroglyph/Petroglyph": ItemData(offset + 179),
+    "Director's Cut/Retcon": ItemData(offset + 180),
+    "Paint Brush/Palette": ItemData(offset + 181),
+    "Overstock/Overstock Plus": ItemData(offset + 182),
+    "Clearance Sale/Liquidation": ItemData(offset + 183),
+    "Hone/Glow Up": ItemData(offset + 184),
+    "Reroll Surplus/Reroll Glut": ItemData(offset + 185),
+    "Crystal Ball/Omen Globe": ItemData(offset + 186),
+    "Telescope/Observatory": ItemData(offset + 187),
+    "Grabber/Nacho Tong": ItemData(offset + 188),
+    "Wasteful/Recyclomancy": ItemData(offset + 189),
+    "Tarot Merchant/Tarot Tycoon": ItemData(offset + 190),
+    "Planet Merchant/Planet Tycoon": ItemData(offset + 191),
+    "Seed Money/Money Tree": ItemData(offset + 192),
+    "Blank/Antimatter": ItemData(offset + 193),
+    "Magic Trick/Illusion": ItemData(offset + 194),
+    "Hieroglyph/Petroglyph": ItemData(offset + 195),
+    "Director's Cut/Retcon": ItemData(offset + 196),
+    "Paint Brush/Palette": ItemData(offset + 197),
 
     # Booster Packs
 
@@ -446,7 +446,8 @@ def is_progression(item_name: str) -> bool:
             is_spectral(item_name) or 
             is_stake(item_name) or
             is_stake_per_deck(item_name) or
-            is_booster(item_name)
+            is_booster(item_name) or
+            is_bundle(item_name)
     )
 
 def is_useful(item_name: str) -> bool:
