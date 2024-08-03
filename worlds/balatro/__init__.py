@@ -88,6 +88,8 @@ class BalatroWorld(World):
             self.required_stake = list(self.options.required_stake_for_goal.value)[0]
         else:
             self.required_stake = self.playable_stakes[0]
+            
+        self.options.decks_win_goal.value = min(self.options.decks_win_goal.value, len(self.playable_decks))
 
     def create_items(self):
         decks_to_unlock = self.options.decks_unlocked_from_start.value
@@ -241,6 +243,7 @@ class BalatroWorld(World):
         if classification is None:
             classification = ItemClassification.filler
             
+        # print(item_name + str(classification))
         return BalatroItem(item_name, classification, item.code, self.player)
 
     def create_regions(self) -> None:
@@ -332,7 +335,7 @@ class BalatroWorld(World):
         # GOALS 
         stake_as_item_per_deck_list = list()
         if self.options.stake_unlock_mode == StakeUnlockMode.option_stake_as_item_per_deck:
-            play_decks = self.playable_decks.copy()
+            play_decks = list(self.playable_decks.copy())
             random.shuffle(play_decks)
             stake_as_item_per_deck_list = list([key + " " + self.required_stake for key in play_decks][0:self.options.decks_win_goal.value])
             
