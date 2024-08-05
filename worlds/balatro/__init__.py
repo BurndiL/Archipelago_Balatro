@@ -17,9 +17,10 @@ from .Locations import BalatroLocation, balatro_location_id_to_name, balatro_loc
 
 
 class BalatroWebWorld(WebWorld):
+    theme = "partyTime"
+    bug_report_page = "https://discord.gg/dESF3rzxQu"
+    rich_text_options_doc = True
     setup_en = Tutorial(
-
-        # TODO: actually do this lmao (help)
         "Multiworld Setup Guide",
         "A guide to setting up Balatro on your computer.",
         "English",
@@ -27,16 +28,19 @@ class BalatroWebWorld(WebWorld):
         "setup/en",
         ["Burndi"]
     )
+    
+    tutorials = [setup_en]
 
 
 class BalatroWorld(World):
     """
-    Balatro is a (insert description about Balatro here).
+    Balatro is a poker-themed roguelike deck-building video game developed by LocalThunk.
+    In the game, players play poker hands to score points and defeat "blinds", while improving their deck and purchasing joker cards with a variety of effects. 
+    Source: https://en.wikipedia.org/wiki/Balatro_(video_game)
     """
     game = "Balatro"
     web = BalatroWebWorld()
 
-    # don't know what this does yet
     topology_present = False
 
     options_dataclass = BalatroOptions
@@ -82,6 +86,13 @@ class BalatroWorld(World):
             self.playable_stakes = playable_stake_choice[0:self.options.include_stakesNumber.value]
         elif self.options.include_stakesMode == IncludeStakesMode.option_choose:
             self.playable_stakes = list(self.options.include_stakesList.value)
+            
+        print(self.playable_stakes)
+        if self.options.stake_unlock_mode == StakeUnlockMode.option_vanilla:
+            unsorted_stakes = list(map(lambda x: stake_to_number[x], self.playable_stakes))
+            unsorted_stakes.sort()
+            self.playable_stakes = list(map(lambda x: number_to_stake[x], unsorted_stakes))
+            print(self.playable_stakes)
         
         
         if list(self.options.required_stake_for_goal.value)[0] in self.playable_stakes:

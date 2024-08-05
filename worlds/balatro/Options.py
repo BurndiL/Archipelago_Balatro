@@ -91,7 +91,6 @@ class RemoveOrDebuffConsumables(Toggle):
     """Decide whether locked consumables will not appear at all, or if they will appear but in a debuffed state. 
     Setting this to true will remove them, setting this to false will debuff them."""
 
- 
 
 class FillerJokers(OptionSet):
     """Which Jokers are supposed to be filler (every Joker not in this list will be considered useful)
@@ -170,14 +169,16 @@ class IncludeStakesNumber(Range):
 class StakeUnlockMode(Choice):
     """Decide how stakes are handled by the Randomizer.
     unlocked: all stakes are unlocked from the start
-    vanilla: stakes are progressively unlocked by beating the stake before
+    vanilla: stakes are progressively unlocked (by beating the previous stake) and in the same order as in the base game
+    linear: stakes are progressively unlocked (by beating the previous stake) but in a random order
     stake_as_item: stakes can be found as items and unlock the stake for every deck
     stake_as_item_per_deck: stakes can be found as items but only unlock it for a specific deck"""
     display_name = "Stake Unlock Mode"
     option_unlocked = 0
     option_vanilla = 1
-    option_stake_as_item = 2
-    option_stake_as_item_per_deck = 3
+    option_linear = 2
+    option_stake_as_item = 3
+    option_stake_as_item_per_deck = 4
     default = option_vanilla
 
 class ShopItems(Range):
