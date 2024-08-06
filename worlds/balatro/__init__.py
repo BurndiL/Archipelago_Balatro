@@ -93,14 +93,12 @@ class BalatroWorld(World):
         elif self.options.include_stakesMode == IncludeStakesMode.option_choose:
             self.playable_stakes = list(self.options.include_stakesList.value)
 
-        print(self.playable_stakes)
         if self.options.stake_unlock_mode == StakeUnlockMode.option_vanilla:
             unsorted_stakes = list(
                 map(lambda x: stake_to_number[x], self.playable_stakes))
             unsorted_stakes.sort()
             self.playable_stakes = list(
                 map(lambda x: number_to_stake[x], unsorted_stakes))
-            print(self.playable_stakes)
 
         if list(self.options.required_stake_for_goal.value)[0] in self.playable_stakes:
             self.required_stake = list(
@@ -110,6 +108,8 @@ class BalatroWorld(World):
 
         self.options.decks_win_goal.value = min(
             self.options.decks_win_goal.value, len(self.playable_decks))
+        
+        self.options.unique_deck_win_goal.value = min(self.options.unique_deck_win_goal.value, len(self.playable_decks) * len(self.playable_stakes))
 
     def create_items(self):
         decks_to_unlock = self.options.decks_unlocked_from_start.value
