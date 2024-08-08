@@ -387,11 +387,11 @@ class BalatroWorld(World):
         def get_locations_where(deck: str = None, ante: int = None, stake: int = None) -> list:
             return list([element for element in all_locations if (ante == None or element.ante == ante) and (stake == None or element.stake == stake) and (deck == None or element.deck == deck)])
 
-        if self.options.goal.value == Options.Goal.option_beat_decks:
+        if self.options.goal.value == Goal.option_beat_decks:
             self.multiworld.completion_condition[self.player] = lambda state: can_reach_count(state, get_locations_where(
                 None, 8, self.required_stake), self.options.decks_win_goal.value)  # you can use required stake because it really doesnt matter
 
-        elif self.options.goal.value == Options.Goal.option_unlock_jokers:
+        elif self.options.goal.value == Goal.option_unlock_jokers:
             self.multiworld.completion_condition[self.player] = lambda state: state.has_from_list(list(jokers.values()),
                                                                                                   self.player,
                                                                                                   self.options.jokers_unlock_goal.value) or  \
