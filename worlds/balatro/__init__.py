@@ -12,7 +12,7 @@ import random
 import math
 from worlds.generic.Rules import add_rule
 from .Options import BalatroOptions, Traps, IncludeDecksMode, StakeUnlockMode, \
-    IncludeStakesMode
+    IncludeStakesMode, Goal
 from .Locations import BalatroLocation, balatro_location_id_to_name, balatro_location_name_to_id, \
     balatro_location_id_to_stake, shop_id_offset, balatro_location_id_to_ante, max_shop_items
 
@@ -398,21 +398,21 @@ class BalatroWorld(World):
                 state.has_from_list(list(joker_bundles.values()), self.player, math.ceil(
                     self.options.jokers_unlock_goal.value / 10))
 
-        elif self.options.goal.value == Options.Goal.option_beat_ante:
+        elif self.options.goal.value == Goal.option_beat_ante:
             self.multiworld.completion_condition[self.player] = lambda state: can_reach_count(
                 state, get_locations_where(None, 8, None), 1)
 
-        elif self.options.goal.value == Options.Goal.option_beat_decks_on_stake:
+        elif self.options.goal.value == Goal.option_beat_decks_on_stake:
             self.multiworld.completion_condition[self.player] = lambda state: can_reach_count(
                 state, get_locations_where(None, 8, self.required_stake), self.options.decks_win_goal.value)
 
-        elif self.options.goal.value == Options.Goal.option_win_with_jokers_on_stake:
+        elif self.options.goal.value == Goal.option_win_with_jokers_on_stake:
             self.multiworld.completion_condition[self.player] = lambda state: \
                 can_reach_count(state, get_locations_where(None, 8, self.required_stake), 1) and \
                 (state.has_from_list(list(jokers.values()), self.player, self.options.jokers_unlock_goal.value) or
                  state.has_from_list(list(joker_bundles.values()), self.player, math.ceil(self.options.jokers_unlock_goal.value / 10)))
 
-        elif self.options.goal.value == Options.Goal.option_beat_unique_decks:
+        elif self.options.goal.value == Goal.option_beat_unique_decks:
             self.multiworld.completion_condition[self.player] = lambda state: can_reach_count(
                 state, get_locations_where(None, 8, None), self.options.unique_deck_win_goal.value)
 
