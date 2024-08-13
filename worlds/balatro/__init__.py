@@ -382,6 +382,8 @@ class BalatroWorld(World):
             for loc in locations:
                 if state.can_reach_location(loc.name, self.player):
                     counter += 1
+                    if counter >= count:
+                        return True
             return counter >= count
 
         def get_locations_where(deck: str = None, ante: int = None, stake: int = None) -> list:
