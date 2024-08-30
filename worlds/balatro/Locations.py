@@ -3,6 +3,7 @@ from .Items import number_to_stake
 from BaseClasses import Location
 
 max_shop_items = 150
+max_consumable_items = 300
 
 # ask what the fuck to put here lol
 offset = 5606_000
@@ -50,3 +51,15 @@ for j in range(8):
 
         balatro_location_name_to_id[location_name] = location_id
         balatro_location_id_to_name[location_id] = location_name
+
+
+# Consumable Locations. Generate maximum amount here as well, but not all will be included in the multiworld
+consumable_id_offset = prev_id + 1 
+
+for j in range(max_consumable_items):
+    prev_id += 1
+    location_name = "Consumable Item " + str(j+1) # This name to be changed (dont forget to change in init.py)
+    location_id = prev_id
+
+    balatro_location_name_to_id[location_name] = location_id
+    balatro_location_id_to_name[location_id] = location_name

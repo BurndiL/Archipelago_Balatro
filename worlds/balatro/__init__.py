@@ -12,9 +12,9 @@ import random
 import math
 from worlds.generic.Rules import add_rule
 from .Options import BalatroOptions, Traps, IncludeDecksMode, StakeUnlockMode, \
-    IncludeStakesMode, Goal
+    IncludeStakesMode, Goal, TarotBundle, SpectralBundle, PlanetBundle
 from .Locations import BalatroLocation, balatro_location_id_to_name, balatro_location_name_to_id, \
-    balatro_location_id_to_stake, shop_id_offset, balatro_location_id_to_ante, max_shop_items
+    balatro_location_id_to_stake, shop_id_offset, balatro_location_id_to_ante, max_shop_items, consumable_id_offset
 
 
 class BalatroWebWorld(WebWorld):
@@ -49,6 +49,7 @@ class BalatroWorld(World):
 
     locations_set = 0
     shop_locations = dict()
+    consumable_locations = dict()
 
     item_name_to_id = item_name_to_id
     item_id_to_name = item_id_to_name
@@ -62,6 +63,14 @@ class BalatroWorld(World):
 
     short_mode_pool = list(jokers.keys())
     random.shuffle(short_mode_pool)
+
+    joker_bundles = []
+    tarot_bundles = []
+    spectral_bundles = []
+    planet_bundles = []
+    bundle_with_custom_tarot = "Tarot Bundle"
+    bundle_with_custom_planet = "Planet Bundle"
+    bundle_with_custom_spectral = "Spectral Bundle"
 
     itempool: Dict[str, int]
 
@@ -108,8 +117,53 @@ class BalatroWorld(World):
 
         self.options.decks_win_goal.value = min(
             self.options.decks_win_goal.value, len(self.playable_decks))
-        
-        self.options.unique_deck_win_goal.value = min(self.options.unique_deck_win_goal.value, len(self.playable_decks) * len(self.playable_stakes))
+
+        self.options.unique_deck_win_goal.value = min(self.options.unique_deck_win_goal.value, len(
+            self.playable_decks) * len(self.playable_stakes))
+
+        # Joker Bundles
+        number_of_bundles = round(
+            len(jokers) / self.options.joker_bundle_size.value)
+        self.joker_bundles = [None] * number_of_bundles
+        for index, joker in enumerate(self.short_mode_pool):
+            if self.joker_bundles[index % number_of_bundles] == None:
+                self.joker_bundles[index % number_of_bundles] = []
+            self.joker_bundles[index % number_of_bundles].append(joker)
+
+        def get_bundles_from_option(bundles) -> list:
+            result = [None] * len(bundles)
+            counter = 0
+            for bundle in bundles:
+                if result[counter] == None:
+                    result[counter] = []
+                for card in bundle.split(';'):
+                    result[counter].append(item_name_to_id[card.strip()])
+                counter += 1
+
+            return result
+
+        # Consumable Bundles
+        if (self.options.tarot_bundle == TarotBundle.option_custom_bundles):
+            self.tarot_bundles = get_bundles_from_option(
+                self.options.custom_tarot_bundles.value)
+            for index, value in enumerate(self.tarot_bundles):
+                if (value).__contains__(item_name_to_id["Archipelago Tarot"]):
+                    self.bundle_with_custom_tarot = "Tarot Bundle " + \
+                        str(index+1)
+
+        if (self.options.planet_bundle == PlanetBundle.option_custom_bundles):
+            self.planet_bundles = get_bundles_from_option(
+                self.options.custom_planet_bundles.value)
+            if (value).__contains__(item_name_to_id["Archipelago Belt"]):
+                self.bundle_with_custom_planet = "Planet Bundle " + \
+                    str(index+1)
+
+        if (self.options.spectral_bundle == SpectralBundle.option_custom_bundles):
+            self.spectral_bundles = get_bundles_from_option(
+                self.options.custom_spectral_bundles.value)
+            if (value).__contains__(item_name_to_id["Archipelago Spectral"]):
+                self.bundle_with_custom_spectral = "Spectral Bundle " + \
+                    str(index+1)
 
     def create_items(self):
         decks_to_unlock = self.options.decks_unlocked_from_start.value
@@ -172,27 +226,49 @@ class BalatroWorld(World):
             if (is_deck(item_name) and not item_name in self.playable_decks):
                 continue
 
-            if (self.options.tarot_bundle and is_tarot(item_name)):
-                continue
-            if (not self.options.tarot_bundle and item_name == "Tarot Bundle"):
+            if (self.options.tarot_bundle != TarotBundle.option_individual and is_tarot(item_name)):
                 continue
 
-            if (self.options.planet_bundle and is_planet(item_name)):
+            if (self.options.tarot_bundle != TarotBundle.option_one_bundle and item_name == "Tarot Bundle"):
                 continue
 
-            if (not self.options.planet_bundle and item_name == "Planet Bundle"):
+            if (self.options.tarot_bundle != TarotBundle.option_custom_bundles and item_name.startswith("Tarot Bundle ")):
                 continue
 
-            if (self.options.spectral_bundle and is_spectral(item_name)):
+            if (self.options.tarot_bundle == TarotBundle.option_custom_bundles and item_name.startswith("Tarot Bundle ") and item_name_to_id[item_name] - offset - 373 > len(self.tarot_bundles)):
                 continue
 
-            if (not self.options.spectral_bundle and item_name == "Spectral Bundle"):
+            if (self.options.planet_bundle != PlanetBundle.option_one_bundle and is_planet(item_name)):
+                continue
+
+            if (self.options.planet_bundle != PlanetBundle.option_individual and item_name == "Planet Bundle"):
+                continue
+
+            if (self.options.planet_bundle != PlanetBundle.option_custom_bundles and item_name.startswith("Planet Bundle ")):
+                continue
+
+            if (self.options.planet_bundle == PlanetBundle.option_custom_bundles and item_name.startswith("Planet Bundle ") and item_name_to_id[item_name] - offset - 378 > len(self.planet_bundles)):
+                continue
+
+            if (self.options.spectral_bundle != SpectralBundle.option_individual and is_spectral(item_name)):
+                continue
+
+            if (self.options.spectral_bundle != SpectralBundle.option_one_bundle and item_name == "Spectral Bundle"):
+                continue
+
+            if (self.options.spectral_bundle != SpectralBundle.option_custom_bundles and item_name.startswith("Spectral Bundle ")):
+                continue
+
+            if (self.options.spectral_bundle == SpectralBundle.option_custom_bundles and item_name.startswith("Spectral Bundle ") and item_name_to_id[item_name] - offset - 383 > len(self.spectral_bundles)):
                 continue
 
             if (self.options.joker_bundles and is_joker(item_name)):
                 continue
 
             if (not self.options.joker_bundles and is_joker_bundle(item_name)):
+                continue
+
+            if (is_joker_bundle(item_name) and len(self.joker_bundles) < (item_name_to_id[item_name] - offset) - 520):
                 continue
 
             if item_name in excludedItems:
@@ -299,7 +375,7 @@ class BalatroWorld(World):
                         # to make life easier for players require some jokers to be found to beat ante 4 and up!
                         if ante >= 4:
                             add_rule(new_location, lambda state, _ante3_=ante: state.has_from_list(list(jokers.values(
-                            )), self.player, 5 + _ante3_ * 2) or state.has_from_list(list(joker_bundles.values()), self.player, _ante3_))
+                            )), self.player, 5 + _ante3_ * 2) or state.has_from_list(list(joker_bundles.values()), self.player, round((_ante3_ * 10) / self.options.joker_bundle_size.value)))
                             add_rule(new_location, lambda state: state.has_from_list(
                                 list(['Buffoon Pack']), self.player, 1))
 
@@ -307,7 +383,7 @@ class BalatroWorld(World):
 
                         if ante > 2:
                             add_rule(new_location, lambda state, _stake2_=stake:
-                                     (state.has_from_list(list(joker_bundles.values()), self.player, _stake2_ - 2) or
+                                     (state.has_from_list(list(joker_bundles.values()), self.player, (_stake2_ - 2)) or
                                       state.has_from_list(list(jokers.values()), self.player, (_stake2_ - 2) * 5)) and
                                      state.has_from_list(list(vouchers.values()), self.player, _stake2_ - 2))
 
@@ -336,47 +412,6 @@ class BalatroWorld(World):
                                     lambda state, _deck_name_=deck_name: state.has(_deck_name_, self.player) or
                                     state.has_from_list(list([key for key, _ in item_table.items() if is_stake_per_deck(key) and key.startswith(_deck_name_)]), self.player, 1))
 
-        # Shop Region
-        for location in balatro_location_name_to_id:
-            if str(location).startswith("Shop Item"):
-                self.shop_locations[balatro_location_name_to_id[location]] = location
-
-        for i in [stake_to_number.get(key) for key in self.playable_stakes]:
-            stake = int(i)
-            shop_region = Region(
-                "Shop " + number_to_stake.get(stake), self.player, self.multiworld)
-            id_offset = shop_id_offset + (stake - 1)*max_shop_items
-
-            list_of_decks_with_stake_attached = list()
-            for j in self.playable_decks:
-                list_of_decks_with_stake_attached.append(
-                    j + " " + number_to_stake[stake])
-
-            for j in range(self.options.shop_items.value):
-                location_name = self.shop_locations[id_offset + j]
-                location_id = id_offset + j
-                new_location = BalatroLocation(
-                    self.player, location_name, location_id, shop_region)
-
-                new_location.progress_type = LocationProgressType.DEFAULT
-
-                # balance out shop items a bit
-                add_rule(new_location, lambda state, _require_=(j / 3):
-                         state.has_from_list(list(jokers.values()), self.player, _require_) or
-                         state.has_from_list(list(joker_bundles.values()), self.player, j / 11))
-
-                shop_region.locations.append(new_location)
-                self.locations_set += 1
-
-            self.multiworld.regions.append(shop_region)
-
-            menu_region.connect(shop_region, rule=lambda state, _stake_=stake, _decklist_=list_of_decks_with_stake_attached:
-                                (self.options.stake_unlock_mode == StakeUnlockMode.option_stake_as_item_per_deck or state.has_any(list(deck_id_to_name.values()), self.player)) and
-                                (self.options.stake_unlock_mode != StakeUnlockMode.option_stake_as_item or state.has(number_to_stake[_stake_], self.player)) and
-                                (self.options.stake_unlock_mode != StakeUnlockMode.option_stake_as_item_per_deck or state.has_from_list(_decklist_, self.player, 1)))
-
-        # GOALS
-
         def can_reach_count(state: CollectionState, locations: List[BalatroLocation], count: int = 1) -> bool:
             counter = 0
             for loc in locations:
@@ -389,6 +424,60 @@ class BalatroWorld(World):
         def get_locations_where(deck: str = None, ante: int = None, stake: int = None) -> list:
             return list([element for element in all_locations if (ante == None or element.ante == ante) and (stake == None or element.stake == stake) and (deck == None or element.deck == deck)])
 
+        # Shop Region
+        for location in balatro_location_name_to_id:
+            if str(location).startswith("Shop Item"):
+                self.shop_locations[balatro_location_name_to_id[location]] = location
+
+        for i in [stake_to_number.get(key) for key in self.playable_stakes]:
+            stake = int(i)
+            shop_region = Region(
+                "Shop " + number_to_stake.get(stake), self.player, self.multiworld)
+            id_offset = shop_id_offset + (stake - 1)*max_shop_items
+
+            for j in range(self.options.shop_items.value):
+                location_name = self.shop_locations[id_offset + j]
+                location_id = id_offset + j
+                new_location = BalatroLocation(
+                    self.player, location_name, location_id, shop_region)
+
+                # balance out shop items a bit
+                add_rule(new_location, lambda state, _require_=j:
+                         state.has_from_list(list(jokers.values()), self.player, _require_ / 3) or
+                         state.has_from_list(list(joker_bundles.values()), self.player, _require_ / (self.options.joker_bundle_size.value * 2)))
+
+                shop_region.locations.append(new_location)
+                self.locations_set += 1
+
+            self.multiworld.regions.append(shop_region)
+
+            # Take stake unlock into account here
+            menu_region.connect(shop_region, lambda state, _stake_=stake: can_reach_count(
+                state, get_locations_where(None, None, _stake_)))
+
+        # Consumable Pool
+        consumable_region = Region(
+            "Consumable Items", self.player, self.multiworld)
+
+        counter = 0
+        for location in balatro_location_name_to_id:
+            if str(location).startswith("Consumable Item") and counter < self.options.ap_consumable_items.value:
+                counter += 1
+                self.consumable_locations[balatro_location_name_to_id[location]] = location
+                location_name = location
+                location_id = balatro_location_name_to_id[location]
+
+                new_location = BalatroLocation(
+                    self.player, location_name, location_id, consumable_region)
+                consumable_region.locations.append(new_location)
+                self.locations_set += 1
+
+        menu_region.connect(consumable_region, rule=lambda state: state.has(
+            "Archipelago Tarot", self.player) or state.has("Archipelago Belt", self.player) or state.has("Archipelago Spectral", self.player) or
+            state.has(self.bundle_with_custom_planet, self.player) or state.has(self.bundle_with_custom_spectral, self.player) or state.has(self.bundle_with_custom_tarot, self.player))
+
+        # GOALS
+
         if self.options.goal.value == Goal.option_beat_decks:
             self.multiworld.completion_condition[self.player] = lambda state: can_reach_count(state, get_locations_where(
                 None, 8, self.required_stake), self.options.decks_win_goal.value)  # you can use required stake because it really doesnt matter
@@ -398,7 +487,7 @@ class BalatroWorld(World):
                                                                                                   self.player,
                                                                                                   self.options.jokers_unlock_goal.value) or  \
                 state.has_from_list(list(joker_bundles.values()), self.player, math.ceil(
-                    self.options.jokers_unlock_goal.value / 10))
+                    self.options.jokers_unlock_goal.value / self.options.joker_bundle_size.value))
 
         elif self.options.goal.value == Goal.option_beat_ante:
             self.multiworld.completion_condition[self.player] = lambda state: can_reach_count(
@@ -412,7 +501,7 @@ class BalatroWorld(World):
             self.multiworld.completion_condition[self.player] = lambda state: \
                 can_reach_count(state, get_locations_where(None, 8, self.required_stake), 1) and \
                 (state.has_from_list(list(jokers.values()), self.player, self.options.jokers_unlock_goal.value) or
-                 state.has_from_list(list(joker_bundles.values()), self.player, math.ceil(self.options.jokers_unlock_goal.value / 10)))
+                 state.has_from_list(list(joker_bundles.values()), self.player, math.ceil(self.options.jokers_unlock_goal.value / self.options.joker_bundle_size.value)))
 
         elif self.options.goal.value == Goal.option_beat_unique_decks:
             self.multiworld.completion_condition[self.player] = lambda state: can_reach_count(
@@ -431,7 +520,7 @@ class BalatroWorld(World):
             "goal": self.options.goal.value,
             "ante_win_goal": self.options.ante_win_goal.value,
             "decks_win_goal": self.options.decks_win_goal.value,
-            "unique_deck_win_goal" : self.options.unique_deck_win_goal.value,
+            "unique_deck_win_goal": self.options.unique_deck_win_goal.value,
             "jokers_unlock_goal": self.options.jokers_unlock_goal.value,
             "required_stake": stake_to_number[self.required_stake],
             "included_stakes": [stake_to_number.get(key) for key in self.playable_stakes],
@@ -444,21 +533,10 @@ class BalatroWorld(World):
             "stake6_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[6])],
             "stake7_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[7])],
             "stake8_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[8])],
-            "jokerbundle1": self.short_mode_pool[0:10],
-            "jokerbundle2": self.short_mode_pool[10:20],
-            "jokerbundle3": self.short_mode_pool[20:30],
-            "jokerbundle4": self.short_mode_pool[30:40],
-            "jokerbundle5": self.short_mode_pool[40:50],
-            "jokerbundle6": self.short_mode_pool[50:60],
-            "jokerbundle7": self.short_mode_pool[60:70],
-            "jokerbundle8": self.short_mode_pool[70:80],
-            "jokerbundle9": self.short_mode_pool[80:90],
-            "jokerbundle10": self.short_mode_pool[90:100],
-            "jokerbundle11": self.short_mode_pool[100:110],
-            "jokerbundle12": self.short_mode_pool[110:120],
-            "jokerbundle13": self.short_mode_pool[120:130],
-            "jokerbundle14": self.short_mode_pool[130:140],
-            "jokerbundle15": self.short_mode_pool[140:150],
+            "jokerbundles": self.joker_bundles,
+            "tarot_bundles": self.tarot_bundles,
+            "planet_bundles": self.planet_bundles,
+            "spectral_bundles": self.spectral_bundles,
             "minimum_price": min_price,
             "maximum_price": max_price,
             "deathlink": bool(self.options.deathlink),

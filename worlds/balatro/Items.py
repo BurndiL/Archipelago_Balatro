@@ -261,42 +261,45 @@ item_table: Dict[str, ItemData] = {
     "The Sun": ItemData(offset + 232),
     "Judgement": ItemData(offset + 233),
     "The World": ItemData(offset + 234),
+    "Archipelago Tarot": ItemData(offset + 235),
 
     # Planet Cards
 
-    "Mercury": ItemData(offset + 235),
-    "Venus": ItemData(offset + 236),
-    "Earth": ItemData(offset + 237),
-    "Mars": ItemData(offset + 238),
-    "Jupiter": ItemData(offset + 239),
-    "Saturn": ItemData(offset + 240),
-    "Uranus": ItemData(offset + 241),
-    "Neptune": ItemData(offset + 242),
-    "Pluto": ItemData(offset + 243),
-    "Planet X": ItemData(offset + 244),
-    "Ceres": ItemData(offset + 245),
-    "Eris": ItemData(offset + 246),
+    "Mercury": ItemData(offset + 236),
+    "Venus": ItemData(offset + 237),
+    "Earth": ItemData(offset + 238),
+    "Mars": ItemData(offset + 239),
+    "Jupiter": ItemData(offset + 240),
+    "Saturn": ItemData(offset + 241),
+    "Uranus": ItemData(offset + 242),
+    "Neptune": ItemData(offset + 243),
+    "Pluto": ItemData(offset + 244),
+    "Planet X": ItemData(offset + 245),
+    "Ceres": ItemData(offset + 246),
+    "Eris": ItemData(offset + 247),
+    "Archipelago Belt": ItemData(offset + 248),
 
     # Spectral Cards
 
-    "Familiar": ItemData(offset + 247),
-    "Grim": ItemData(offset + 248),
-    "Incantation": ItemData(offset + 249),
-    "Talisman": ItemData(offset + 250),
-    "Aura": ItemData(offset + 251),
-    "Wraith": ItemData(offset + 252),
-    "Sigil": ItemData(offset + 253),
-    "Ouija": ItemData(offset + 254),
-    "Ectoplasm": ItemData(offset + 255),
-    "Immolate": ItemData(offset + 256),
-    "Ankh": ItemData(offset + 257),
-    "Deja Vu": ItemData(offset + 258),
-    "Hex": ItemData(offset + 259),
-    "Trance": ItemData(offset + 260),
-    "Medium": ItemData(offset + 261),
-    "Cryptid": ItemData(offset + 262),
-    "The Soul": ItemData(offset + 263),
-    "Black Hole": ItemData(offset + 264),
+    "Familiar": ItemData(offset + 249),
+    "Grim": ItemData(offset + 250),
+    "Incantation": ItemData(offset + 251),
+    "Talisman": ItemData(offset + 252),
+    "Aura": ItemData(offset + 253),
+    "Wraith": ItemData(offset + 254),
+    "Sigil": ItemData(offset + 255),
+    "Ouija": ItemData(offset + 256),
+    "Ectoplasm": ItemData(offset + 257),
+    "Immolate": ItemData(offset + 258),
+    "Ankh": ItemData(offset + 259),
+    "Deja Vu": ItemData(offset + 260),
+    "Hex": ItemData(offset + 261),
+    "Trance": ItemData(offset + 262),
+    "Medium": ItemData(offset + 263),
+    "Cryptid": ItemData(offset + 264),
+    "The Soul": ItemData(offset + 265),
+    "Black Hole": ItemData(offset + 266),
+    "Archipelago Spectral": ItemData(offset + 267),
 
     # OP Filler Bonus Items
     "Bonus Discards": ItemData(offset + 301),
@@ -329,27 +332,29 @@ item_table: Dict[str, ItemData] = {
     "Eternal Trap": ItemData(offset + 334),
     "Rental Trap": ItemData(offset + 335),
 
-    # Joker Bundle (for short mode)
-    "Joker Bundle 1": ItemData(offset + 351),
-    "Joker Bundle 2": ItemData(offset + 352),
-    "Joker Bundle 3": ItemData(offset + 353),
-    "Joker Bundle 4": ItemData(offset + 354),
-    "Joker Bundle 5": ItemData(offset + 355),
-    "Joker Bundle 6": ItemData(offset + 356),
-    "Joker Bundle 7": ItemData(offset + 357),
-    "Joker Bundle 8": ItemData(offset + 358),
-    "Joker Bundle 9": ItemData(offset + 359),
-    "Joker Bundle 10": ItemData(offset + 360),
-    "Joker Bundle 11": ItemData(offset + 361),
-    "Joker Bundle 12": ItemData(offset + 362),
-    "Joker Bundle 13": ItemData(offset + 363),
-    "Joker Bundle 14": ItemData(offset + 364),
-    "Joker Bundle 15": ItemData(offset + 365),
-
     # Consumable Bundles
     "Tarot Bundle": ItemData(offset + 371),
     "Planet Bundle": ItemData(offset + 372),
     "Spectral Bundle": ItemData(offset + 373),
+
+    # Custom Consumable Bundles
+    "Tarot Bundle 1": ItemData(offset + 374),
+    "Tarot Bundle 2": ItemData(offset + 375),
+    "Tarot Bundle 3": ItemData(offset + 376),
+    "Tarot Bundle 4": ItemData(offset + 377),
+    "Tarot Bundle 5": ItemData(offset + 378),
+
+    "Planet Bundle 1": ItemData(offset + 379),
+    "Planet Bundle 2": ItemData(offset + 380),
+    "Planet Bundle 3": ItemData(offset + 381),
+    "Planet Bundle 4": ItemData(offset + 382),
+    "Planet Bundle 5": ItemData(offset + 383),
+
+    "Spectral Bundle 1": ItemData(offset + 384),
+    "Spectral Bundle 2": ItemData(offset + 385),
+    "Spectral Bundle 3": ItemData(offset + 386),
+    "Spectral Bundle 4": ItemData(offset + 387),
+    "Spectral Bundle 5": ItemData(offset + 388),
 
     # Stakes as Items
     "White Stake": ItemData(offset + 390),
@@ -360,6 +365,40 @@ item_table: Dict[str, ItemData] = {
     "Purple Stake": ItemData(offset + 395),
     "Orange Stake": ItemData(offset + 396),
     "Gold Stake": ItemData(offset + 397),
+
+    # is stake per deck takes up ids 400 - 520 here
+    
+    # Joker Bundles
+    "Joker Bundle 1": ItemData(offset + 521),
+    "Joker Bundle 2": ItemData(offset + 522),
+    "Joker Bundle 3": ItemData(offset + 523),
+    "Joker Bundle 4": ItemData(offset + 524),
+    "Joker Bundle 5": ItemData(offset + 525),
+    "Joker Bundle 6": ItemData(offset + 526),
+    "Joker Bundle 7": ItemData(offset + 527),
+    "Joker Bundle 8": ItemData(offset + 528),
+    "Joker Bundle 9": ItemData(offset + 529),
+    "Joker Bundle 10": ItemData(offset + 530),
+    "Joker Bundle 11": ItemData(offset + 531),
+    "Joker Bundle 12": ItemData(offset + 532),
+    "Joker Bundle 13": ItemData(offset + 533),
+    "Joker Bundle 14": ItemData(offset + 534),
+    "Joker Bundle 15": ItemData(offset + 535),
+    "Joker Bundle 16": ItemData(offset + 536),
+    "Joker Bundle 17": ItemData(offset + 537),
+    "Joker Bundle 18": ItemData(offset + 538),
+    "Joker Bundle 19": ItemData(offset + 539),
+    "Joker Bundle 20": ItemData(offset + 540),
+    "Joker Bundle 21": ItemData(offset + 541),
+    "Joker Bundle 22": ItemData(offset + 542),
+    "Joker Bundle 23": ItemData(offset + 543),
+    "Joker Bundle 24": ItemData(offset + 544),
+    "Joker Bundle 25": ItemData(offset + 545),
+    "Joker Bundle 26": ItemData(offset + 546),
+    "Joker Bundle 27": ItemData(offset + 547),
+    "Joker Bundle 28": ItemData(offset + 548),
+    "Joker Bundle 29": ItemData(offset + 549),
+    "Joker Bundle 30": ItemData(offset + 540),
 }
 
 stake_to_number: Dict[str, int] = {
@@ -417,28 +456,25 @@ def is_booster(item_name: str) -> bool:
 
 def is_tarot(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
-    return (item_id >= 213 and item_id <= 234)
+    return (item_id >= 213 and item_id <= 235)
 
 
 def is_planet(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
-    return (item_id >= 235 and item_id <= 246)
+    return (item_id >= 236 and item_id <= 248)
 
 
 def is_spectral(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
-    return (item_id >= 247 and item_id <= 264)
-
-
-def is_bundle(item_name: str) -> bool:
-    item_id = item_name_to_id[item_name] - offset
-    return (item_id >= 351 and item_id <= 373)
-
+    return (item_id >= 249 and item_id <= 267)
 
 def is_joker_bundle(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
-    return (item_id >= 351 and item_id <= 365)
+    return (item_id >= 521 and item_id <= 540)
 
+def is_bundle(item_name: str) -> bool:
+    item_id = item_name_to_id[item_name] - offset
+    return (item_id >= 371 and item_id <= 388) or is_joker_bundle(item_name)
 
 def is_stake(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset

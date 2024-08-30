@@ -3,8 +3,8 @@ from enum import IntEnum
 from typing import TypedDict, Dict
 from BaseClasses import Item
 from .Items import item_table, is_joker, stake_to_number, number_to_stake
-from .Locations import max_shop_items
-from Options import DefaultOnToggle, OptionSet, PerGameCommonOptions, Toggle, Range, Choice, Option
+from .Locations import max_shop_items, max_consumable_items
+from Options import DefaultOnToggle, OptionSet, PerGameCommonOptions, Toggle, Range, Choice, Option, FreeText
 from .BalatroDecks import deck_id_to_name
 
 
@@ -74,30 +74,69 @@ class RequiredStakeForGoal(OptionSet):
 class JokerBundles(Toggle):
     """Instead of making every joker an individual item, you have the option to put them into bundles, 
     resulting in faster progress and less items that need to be placed in the world.
-    If set to true: All 150 joker items are put in 15 randomly generated joker bundles."""
+    If set to true: All 150 joker items are put in randomly generated joker bundles.
+    The size of Joker Bundles can be specified."""
     display_name = "Joker Bundles"
+    
+class JokerBundleSize(Range):
+    """Specify the size of the Joker Bundles. Currently every bundle needs to have the same size."""
+    display_name = "Joker Bundle Size"
+    range_start = 5
+    range_end = 30
+    default = 10
 
-
-class TarotBundle(Toggle):
+class TarotBundle(Choice):
     """Instead of making every tarot card an individual item, you have the option to put them all in one bundle, 
     that gets placed in the world.
-    If set to true: All tarot cards are put into 1 tarot bundle"""
+    There is also the possibility to make custom bundles."""
     display_name = "Tarot Bundle"
+    option_individual = 0
+    option_one_bundle = 1
+    option_custom_bundles = 2
 
-
-class PlanetBundle(Toggle):
+class CustomTarotBundles(OptionSet):
+    """Only fuck with this if you really want to. You can define up to 5 custom bundles. You have to 
+    include every tarot, otherwise it won't work (there is no proper check for this so PLEASE double or triple check yourself). 
+    If you have Number of AP consumable items set to greater than 1 you also
+    must include the "Archipelago Tarot". Here is a list of all Tarot cards https://balatrogame.fandom.com/wiki/Tarot_Cards.
+    The Syntax of this is the following: ['The Fool;The Magician;The High Priestess;The Empress;The Emperor', ...] where the bundles are separated by the commas.
+    Make sure to use the right symbols."""
+    display_name = "Custom Tarot Bundles"
+    default = ["The Fool;The Magician;The High Priestess;The Empress;The Emperor","The Hierophant;The Lovers","The Chariot;Justice;The Hermit;The Wheel of Fortune;Strength;Death","The Hanged Man;Temperance;The Devil;The Tower;The Star","The Moon;The Sun;Judgement;The World"]
+    
+class PlanetBundle(Choice):
     """Instead of making every planet card an individual item, you have the option to put them all in one bundle, 
     that gets placed in the world.
-    If set to true: All planet cards are put into 1 planet bundle"""
+    There is also the possibility to make custom bundles."""
     display_name = "Planet Bundle"
+    option_individual = 0
+    option_one_bundle = 1
+    option_custom_bundles = 2
+    
+class CustomPlanetBundles(OptionSet):
+    """Only fuck with this if you really want to. You can define up to 5 custom bundles. You have to 
+    include every planet, otherwise it won't work. If you have Number of AP consumable items set to greater than 1 you also
+    must include the "Archipelago Belt". Here is a list of all Planet cards https://balatrogame.fandom.com/wiki/Planet_Cards.
+    For the Syntax refer to Custom Tarot Bundles, it's the same here."""
+    display_name = "Custom Planet Bundles"
+    default = []
 
-
-class SpectralBundle(Toggle):
+class SpectralBundle(Choice):
     """Instead of making every spectral card an individual item, you have the option to put them all in one bundle, 
     that gets placed in the world.
-    If set to true: All spectral cards are put into 1 spectral bundle"""
+    There is also the possibility to make custom bundles."""
     display_name = "Spectral Bundle"
+    option_individual = 0
+    option_one_bundle = 1
+    option_custom_bundles = 2
 
+class CustomSpectralBundles(OptionSet):
+    """Only fuck with this if you really want to. You can define up to 5 custom bundles. You have to 
+    include every spectral, otherwise it won't work. If you have Number of AP consumable items set to greater than 1 you also
+    must include the "Archipelago Spectral". Here is a list of all Planet cards https://balatrogame.fandom.com/wiki/Spectral_Cards.
+    For the Syntax refer to Custom Tarot Bundles, it's the same here."""
+    display_name = "Custom Spectral Bundles"
+    default = []
 
 class RemoveOrDebuffJokers(Toggle):
     """Decide whether locked jokers will not appear at all, or if they will appear but in a debuffed state. 
@@ -231,6 +270,13 @@ class MaximumShopPrice(Range):
     range_end = 100
     default = 10
 
+class ArchipelagoConsumableItems(Range):
+    """Number of items that can be received by redeeming 
+    an AP planet, tarot or spectral card"""
+    display_name = "Number of AP consumable items"
+    range_start = 0
+    range_end = max_consumable_items # 300
+    default = 100
 
 class DecksUnlockedFromStart(Range):
     """Number of random decks you want to start with."""
@@ -284,9 +330,13 @@ class BalatroOptions(PerGameCommonOptions):
 
     # modifiers
     joker_bundles: JokerBundles
+    joker_bundle_size : JokerBundleSize
     tarot_bundle: TarotBundle
+    custom_tarot_bundles : CustomTarotBundles
     planet_bundle: PlanetBundle
+    custom_planet_bundles : CustomPlanetBundles
     spectral_bundle: SpectralBundle
+    custom_spectral_bundles : CustomSpectralBundles
 
     remove_or_debuff_jokers: RemoveOrDebuffJokers
     remove_or_debuff_consumables: RemoveOrDebuffConsumables
@@ -309,6 +359,7 @@ class BalatroOptions(PerGameCommonOptions):
     # items
     filler_jokers: FillerJokers
     shop_items: ShopItems
+    ap_consumable_items: ArchipelagoConsumableItems
     minimum_price: MinimumShopPrice
     maximum_price: MaximumShopPrice
     permanent_filler: OpFillerAmount
