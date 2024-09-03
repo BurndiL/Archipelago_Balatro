@@ -13,6 +13,7 @@ import math
 from worlds.generic.Rules import add_rule
 from .Options import BalatroOptions, Traps, IncludeDecksMode, StakeUnlockMode, \
     IncludeStakesMode, Goal, TarotBundle, SpectralBundle, PlanetBundle
+from Options import OptionError
 from .Locations import BalatroLocation, balatro_location_id_to_name, balatro_location_name_to_id, \
     balatro_location_id_to_stake, shop_id_offset, balatro_location_id_to_ante, max_shop_items, consumable_id_offset
 
@@ -144,6 +145,14 @@ class BalatroWorld(World):
 
         # Consumable Bundles
         if (self.options.tarot_bundle == TarotBundle.option_custom_bundles):
+            if len(self.options.custom_tarot_bundles.value) == 0:
+                raise OptionError("No Custom Tarots Specified. To avoid this turn off custom tarot bundles")
+            
+            if len(self.options.custom_tarot_bundles.value) > 5:
+                raise OptionError("Too many custom Tarot Bundles specified.")
+            
+            
+            
             self.tarot_bundles = get_bundles_from_option(
                 self.options.custom_tarot_bundles.value)
             for index, value in enumerate(self.tarot_bundles):
@@ -152,6 +161,13 @@ class BalatroWorld(World):
                         str(index+1)
 
         if (self.options.planet_bundle == PlanetBundle.option_custom_bundles):
+            if len(self.options.custom_planet_bundles.value) == 0:
+                raise OptionError("No Custom Planets Specified. To avoid this turn off custom planet bundles")
+            
+            if len(self.options.custom_tarot_bundles.value) > 5:
+                raise OptionError("Too many custom Planet Bundles specified.")
+            
+            
             self.planet_bundles = get_bundles_from_option(
                 self.options.custom_planet_bundles.value)
             if (value).__contains__(item_name_to_id["Archipelago Belt"]):
@@ -159,11 +175,26 @@ class BalatroWorld(World):
                     str(index+1)
 
         if (self.options.spectral_bundle == SpectralBundle.option_custom_bundles):
+            if len(self.options.custom_spectral_bundles.value) == 0:
+                raise OptionError("No Custom Spectrals Specified. To avoid this turn off custom spectral bundles")
+            
+            if len(self.options.custom_tarot_bundles.value) > 5:
+                raise OptionError("Too many custom Spectral Bundles specified.")
+            
             self.spectral_bundles = get_bundles_from_option(
                 self.options.custom_spectral_bundles.value)
             if (value).__contains__(item_name_to_id["Archipelago Spectral"]):
                 self.bundle_with_custom_spectral = "Spectral Bundle " + \
                     str(index+1)
+                    
+                    
+        self.multiworld.local_early_items[self.player]["Archipelago Tarot"] = 1
+        self.multiworld.local_early_items[self.player]["Archipelago Planet"] = 1
+        self.multiworld.local_early_items[self.player]["Archipelago Spectral"] = 1
+        self.multiworld.local_early_items[self.player][self.bundle_with_custom_tarot] = 1
+        self.multiworld.local_early_items[self.player][self.bundle_with_custom_spectral] = 1
+        self.multiworld.local_early_items[self.player][self.bundle_with_custom_planet] = 1
+
 
     def create_items(self):
         decks_to_unlock = self.options.decks_unlocked_from_start.value
@@ -533,6 +564,7 @@ class BalatroWorld(World):
             "stake6_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[6])],
             "stake7_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[7])],
             "stake8_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[8])],
+            "consumable_pool_locations:" : [key for key, _ in self.consumable_locations.items()], 
             "jokerbundles": self.joker_bundles,
             "tarot_bundles": self.tarot_bundles,
             "planet_bundles": self.planet_bundles,

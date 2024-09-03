@@ -4,7 +4,7 @@ from typing import TypedDict, Dict
 from BaseClasses import Item
 from .Items import item_table, is_joker, stake_to_number, number_to_stake
 from .Locations import max_shop_items, max_consumable_items
-from Options import DefaultOnToggle, OptionSet, PerGameCommonOptions, Toggle, Range, Choice, Option, FreeText
+from Options import DefaultOnToggle, OptionSet, PerGameCommonOptions, Toggle, Range, Choice, Option, FreeText, Visibility
 from .BalatroDecks import deck_id_to_name
 
 
@@ -101,6 +101,7 @@ class CustomTarotBundles(OptionSet):
     must include the "Archipelago Tarot". Here is a list of all Tarot cards https://balatrogame.fandom.com/wiki/Tarot_Cards.
     The Syntax of this is the following: ['The Fool;The Magician;The High Priestess;The Empress;The Emperor', ...] where the bundles are separated by the commas.
     Make sure to use the right symbols."""
+    # visibility = Visibility.complex_ui
     display_name = "Custom Tarot Bundles"
     default = ["The Fool;The Magician;The High Priestess;The Empress;The Emperor","The Hierophant;The Lovers","The Chariot;Justice;The Hermit;The Wheel of Fortune;Strength;Death","The Hanged Man;Temperance;The Devil;The Tower;The Star","The Moon;The Sun;Judgement;The World"]
     
