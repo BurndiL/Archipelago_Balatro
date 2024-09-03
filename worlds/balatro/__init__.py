@@ -564,7 +564,7 @@ class BalatroWorld(World):
             "stake6_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[6])],
             "stake7_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[7])],
             "stake8_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[8])],
-            "consumable_pool_locations:" : [key for key, _ in self.consumable_locations.items()], 
+            "consumable_pool_locations" : [key for key, _ in self.consumable_locations.items()], 
             "jokerbundles": self.joker_bundles,
             "tarot_bundles": self.tarot_bundles,
             "planet_bundles": self.planet_bundles,
