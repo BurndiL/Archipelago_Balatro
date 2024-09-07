@@ -398,7 +398,7 @@ item_table: Dict[str, ItemData] = {
     "Joker Bundle 27": ItemData(offset + 547),
     "Joker Bundle 28": ItemData(offset + 548),
     "Joker Bundle 29": ItemData(offset + 549),
-    "Joker Bundle 30": ItemData(offset + 540),
+    "Joker Bundle 30": ItemData(offset + 550),
 }
 
 stake_to_number: Dict[str, int] = {
