@@ -312,8 +312,8 @@ item_table: Dict[str, ItemData] = {
 
     # Filler Bonus Items
     "Bonus Money": ItemData(offset + 310),
-    "Receive Buffoon Pack": ItemData(offset + 311),
-    "Receive Consumable Pack": ItemData(offset + 312),
+    "Free Buffoon Pack": ItemData(offset + 311),
+    "Free Consumable Pack": ItemData(offset + 312),
     "Bonus Juggle Tag": ItemData(offset + 313),
     "Bonus D6 Tag": ItemData(offset + 314),
     "Bonus Uncommon Tag": ItemData(offset + 315),
