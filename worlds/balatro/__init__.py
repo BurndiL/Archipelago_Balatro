@@ -187,13 +187,10 @@ class BalatroWorld(World):
                 self.bundle_with_custom_spectral = "Spectral Bundle " + \
                     str(index+1)
                     
-                    
-        self.multiworld.local_early_items[self.player]["Archipelago Tarot"] = 1
-        self.multiworld.local_early_items[self.player]["Archipelago Planet"] = 1
-        self.multiworld.local_early_items[self.player]["Archipelago Spectral"] = 1
-        self.multiworld.local_early_items[self.player][self.bundle_with_custom_tarot] = 1
-        self.multiworld.local_early_items[self.player][self.bundle_with_custom_spectral] = 1
-        self.multiworld.local_early_items[self.player][self.bundle_with_custom_planet] = 1
+                   
+        # make consumable pool accessible as soon as possible
+        self.multiworld.local_early_items[self.player][random.choice(["Archipelago Tarot", "Archipelago Belt"])] = 1        
+        self.multiworld.local_early_items[self.player][random.choice([self.bundle_with_custom_tarot, self.bundle_with_custom_planet])] = 1
 
 
     def create_items(self):
@@ -257,10 +254,10 @@ class BalatroWorld(World):
             if (is_deck(item_name) and not item_name in self.playable_decks):
                 continue
 
-            if (self.options.tarot_bundle != TarotBundle.option_individual and is_tarot(item_name)):
+            if (self.options.tarot_bundle != TarotBundle.option_individual and item_name == "Tarot Bundle"):
                 continue
 
-            if (self.options.tarot_bundle != TarotBundle.option_one_bundle and item_name == "Tarot Bundle"):
+            if (self.options.tarot_bundle != TarotBundle.option_one_bundle and is_tarot(item_name)):
                 continue
 
             if (self.options.tarot_bundle != TarotBundle.option_custom_bundles and item_name.startswith("Tarot Bundle ")):
@@ -269,10 +266,10 @@ class BalatroWorld(World):
             if (self.options.tarot_bundle == TarotBundle.option_custom_bundles and item_name.startswith("Tarot Bundle ") and item_name_to_id[item_name] - offset - 373 > len(self.tarot_bundles)):
                 continue
 
-            if (self.options.planet_bundle != PlanetBundle.option_one_bundle and is_planet(item_name)):
+            if (self.options.planet_bundle != PlanetBundle.option_one_bundle and item_name == "Planet Bundle"):
                 continue
 
-            if (self.options.planet_bundle != PlanetBundle.option_individual and item_name == "Planet Bundle"):
+            if (self.options.planet_bundle != PlanetBundle.option_individual and is_planet(item_name)):
                 continue
 
             if (self.options.planet_bundle != PlanetBundle.option_custom_bundles and item_name.startswith("Planet Bundle ")):
@@ -281,10 +278,10 @@ class BalatroWorld(World):
             if (self.options.planet_bundle == PlanetBundle.option_custom_bundles and item_name.startswith("Planet Bundle ") and item_name_to_id[item_name] - offset - 378 > len(self.planet_bundles)):
                 continue
 
-            if (self.options.spectral_bundle != SpectralBundle.option_individual and is_spectral(item_name)):
+            if (self.options.spectral_bundle != SpectralBundle.option_individual and item_name == "Spectral Bundle"):
                 continue
 
-            if (self.options.spectral_bundle != SpectralBundle.option_one_bundle and item_name == "Spectral Bundle"):
+            if (self.options.spectral_bundle != SpectralBundle.option_one_bundle and is_spectral(item_name)):
                 continue
 
             if (self.options.spectral_bundle != SpectralBundle.option_custom_bundles and item_name.startswith("Spectral Bundle ")):
