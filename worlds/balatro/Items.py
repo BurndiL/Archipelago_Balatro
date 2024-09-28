@@ -367,7 +367,7 @@ item_table: Dict[str, ItemData] = {
     "Gold Stake": ItemData(offset + 397),
 
     # is stake per deck takes up ids 400 - 520 here
-    
+
     # Joker Bundles
     "Joker Bundle 1": ItemData(offset + 521),
     "Joker Bundle 2": ItemData(offset + 522),
@@ -468,13 +468,16 @@ def is_spectral(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
     return (item_id >= 249 and item_id <= 267)
 
+
 def is_joker_bundle(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
     return (item_id >= 521 and item_id <= 540)
 
+
 def is_bundle(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
-    return (item_id >= 371 and item_id <= 388) or is_joker_bundle(item_name)
+    return is_spectral_bundle(item_name) or is_joker_bundle(item_name) or is_tarot_bundle(item_name) or is_planet_bundle(item_name)
+
 
 def is_stake(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
@@ -484,6 +487,21 @@ def is_stake(item_name: str) -> bool:
 def is_stake_per_deck(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
     return (item_id >= 400 and item_id <= 520)
+
+
+def is_planet_bundle(item_name: str) -> bool:
+    item_id = item_name_to_id[item_name] - offset
+    return (item_id >= 379 and item_id <= 383) or item_id == 372
+
+
+def is_tarot_bundle(item_name: str) -> bool:
+    item_id = item_name_to_id[item_name] - offset
+    return (item_id >= 374 and item_id <= 378) or item_id == 371
+
+
+def is_spectral_bundle(item_name: str) -> bool:
+    item_id = item_name_to_id[item_name] - offset
+    return (item_id >= 384 and item_id <= 388) or item_id == 373
 
 
 def is_progression(item_name: str) -> bool:
@@ -502,6 +520,18 @@ def is_progression(item_name: str) -> bool:
 
 def is_useful(item_name: str) -> bool:
     return False  # maybe we will find a useful items in the future
+
+
+def get_category(item_name: str) -> str:
+    if is_planet(item_name) or is_planet_bundle(item_name):
+        return "planet"
+    if is_tarot(item_name) or is_tarot_bundle(item_name):
+        return "tarot"
+    if is_spectral(item_name) or is_spectral_bundle(item_name):
+        return "spectral"
+    if is_joker(item_name) or is_joker_bundle(item_name):
+        return "joker"
+    return "other"
 
 
 item_id_to_name: Dict[int, str] = {
