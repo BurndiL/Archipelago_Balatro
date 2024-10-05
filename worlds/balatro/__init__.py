@@ -254,10 +254,10 @@ class BalatroWorld(World):
             if (is_deck(item_name) and not item_name in self.playable_decks):
                 continue
 
-            if (self.options.tarot_bundle != TarotBundle.option_individual and item_name == "Tarot Bundle"):
+            if (self.options.tarot_bundle != TarotBundle.option_one_bundle and item_name == "Tarot Bundle"):
                 continue
 
-            if (self.options.tarot_bundle != TarotBundle.option_one_bundle and is_tarot(item_name)):
+            if (self.options.tarot_bundle != TarotBundle.option_individual and is_tarot(item_name)):
                 continue
 
             if (self.options.tarot_bundle != TarotBundle.option_custom_bundles and item_name.startswith("Tarot Bundle ")):
@@ -278,10 +278,10 @@ class BalatroWorld(World):
             if (self.options.planet_bundle == PlanetBundle.option_custom_bundles and item_name.startswith("Planet Bundle ") and item_name_to_id[item_name] - offset - 378 > len(self.planet_bundles)):
                 continue
 
-            if (self.options.spectral_bundle != SpectralBundle.option_individual and item_name == "Spectral Bundle"):
+            if (self.options.spectral_bundle != SpectralBundle.option_one_bundle and item_name == "Spectral Bundle"):
                 continue
 
-            if (self.options.spectral_bundle != SpectralBundle.option_one_bundle and is_spectral(item_name)):
+            if (self.options.spectral_bundle != SpectralBundle.option_individual and is_spectral(item_name)):
                 continue
 
             if (self.options.spectral_bundle != SpectralBundle.option_custom_bundles and item_name.startswith("Spectral Bundle ")):
