@@ -447,7 +447,7 @@ class BalatroWorld(World):
                     counter += 1
                     if counter >= count:
                         return True
-            return counter >= count
+            return False
 
         def get_locations_where(deck: str = None, ante: int = None, stake: int = None) -> list:
             return list([element for element in all_locations if (ante == None or element.ante == ante) and (stake == None or element.stake == stake) and (deck == None or element.deck == deck)])
@@ -480,8 +480,8 @@ class BalatroWorld(World):
             self.multiworld.regions.append(shop_region)
 
             # Take stake unlock into account here
-            menu_region.connect(shop_region, lambda state, _stake_=stake: can_reach_count(
-                state, get_locations_where(None, None, _stake_)))
+            menu_region.connect(shop_region, None, lambda state, _stake_=stake: can_reach_count(
+                state, get_locations_where(None, 1, _stake_)))
 
         # Consumable Pool
         consumable_region = Region(
@@ -500,7 +500,7 @@ class BalatroWorld(World):
                 consumable_region.locations.append(new_location)
                 self.locations_set += 1
 
-        menu_region.connect(consumable_region, rule=lambda state: state.has(
+        menu_region.connect(consumable_region, None, rule=lambda state: state.has(
             "Archipelago Tarot", self.player) or state.has("Archipelago Belt", self.player) or state.has("Archipelago Spectral", self.player) or
             state.has(self.bundle_with_custom_planet, self.player) or state.has(self.bundle_with_custom_spectral, self.player) or state.has(self.bundle_with_custom_tarot, self.player))
 
