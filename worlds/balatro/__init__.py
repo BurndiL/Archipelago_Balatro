@@ -508,7 +508,7 @@ class BalatroWorld(World):
 
         if self.options.goal.value == Goal.option_beat_decks:
             self.multiworld.completion_condition[self.player] = lambda state: can_reach_count(state, get_locations_where(
-                None, 8, self.required_stake), self.options.decks_win_goal.value)  # you can use required stake because it really doesnt matter
+                None, 8, stake_to_number[self.required_stake]), self.options.decks_win_goal.value)  # you can use required stake because it really doesnt matter
 
         elif self.options.goal.value == Goal.option_unlock_jokers:
             self.multiworld.completion_condition[self.player] = lambda state: state.has_from_list(list(jokers.values()),
@@ -523,11 +523,11 @@ class BalatroWorld(World):
 
         elif self.options.goal.value == Goal.option_beat_decks_on_stake:
             self.multiworld.completion_condition[self.player] = lambda state: can_reach_count(
-                state, get_locations_where(None, 8, self.required_stake), self.options.decks_win_goal.value)
+                state, get_locations_where(None, 8, stake_to_number[self.required_stake]), self.options.decks_win_goal.value)
 
         elif self.options.goal.value == Goal.option_win_with_jokers_on_stake:
             self.multiworld.completion_condition[self.player] = lambda state: \
-                can_reach_count(state, get_locations_where(None, 8, self.required_stake), 1) and \
+                can_reach_count(state, get_locations_where(None, 8, stake_to_number[self.required_stake]), 1) and \
                 (state.has_from_list(list(jokers.values()), self.player, self.options.jokers_unlock_goal.value) or
                  state.has_from_list(list(joker_bundles.values()), self.player, math.ceil(self.options.jokers_unlock_goal.value / self.options.joker_bundle_size.value)))
 
