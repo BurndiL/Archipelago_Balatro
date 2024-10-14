@@ -450,7 +450,7 @@ class BalatroWorld(World):
             return False
 
         def get_locations_where(deck: str = None, ante: int = None, stake: int = None) -> list:
-            return list([element for element in all_locations if (ante == None or element.ante == ante) and (stake == None or element.stake == stake) and (deck == None or element.deck == deck)])
+            return list([element for element in all_locations if (ante == None or element.ante == ante) and (stake == None or stake_to_number[element.stake] == stake) and (deck == None or element.deck == deck)])
 
         # Shop Region
         for location in balatro_location_name_to_id:
@@ -481,7 +481,7 @@ class BalatroWorld(World):
 
             # Take stake unlock into account here
             menu_region.connect(shop_region, None, lambda state, _stake_=stake: can_reach_count(
-                state, get_locations_where(None, 1, _stake_)))
+                state, get_locations_where(None, None, _stake_)))
 
         # Consumable Pool
         consumable_region = Region(
