@@ -545,6 +545,12 @@ class BalatroWorld(World):
         if min_price > max_price:
             min_price, max_price = max_price, min_price
 
+        created_regions = self.multiworld.get_regions(self.player)
+        created_regions = list(map(lambda region: region.name, created_regions))
+        
+        def get_addresses_from_region(region: str):
+            return list(map(lambda location: location.address, self.get_region(region).locations)) if (region in created_regions) else [],
+
         base_data = {
             "goal": self.options.goal.value,
             "ante_win_goal": self.options.ante_win_goal.value,
@@ -554,14 +560,14 @@ class BalatroWorld(World):
             "required_stake": stake_to_number[self.required_stake],
             "included_stakes": [stake_to_number.get(key) for key in self.playable_stakes],
             "included_decks": [deck_name_to_key.get(key) for key in self.playable_decks],
-            "stake1_shop_locations": [key for i, (key, value) in enumerate(self.shop_locations.items()) if str(value).__contains__(number_to_stake[1]) and i < self.options.shop_items.value],
-            "stake2_shop_locations": [key for i, (key, value) in enumerate(self.shop_locations.items()) if str(value).__contains__(number_to_stake[2]) and i < self.options.shop_items.value + max_shop_items],
-            "stake3_shop_locations": [key for i, (key, value) in enumerate(self.shop_locations.items()) if str(value).__contains__(number_to_stake[3]) and i < self.options.shop_items.value + max_shop_items * 2],
-            "stake4_shop_locations": [key for i, (key, value) in enumerate(self.shop_locations.items()) if str(value).__contains__(number_to_stake[4]) and i < self.options.shop_items.value + max_shop_items * 3],
-            "stake5_shop_locations": [key for i, (key, value) in enumerate(self.shop_locations.items()) if str(value).__contains__(number_to_stake[5]) and i < self.options.shop_items.value + max_shop_items * 4],
-            "stake6_shop_locations": [key for i, (key, value) in enumerate(self.shop_locations.items()) if str(value).__contains__(number_to_stake[6]) and i < self.options.shop_items.value + max_shop_items * 5],
-            "stake7_shop_locations": [key for i, (key, value) in enumerate(self.shop_locations.items()) if str(value).__contains__(number_to_stake[7]) and i < self.options.shop_items.value + max_shop_items * 6],
-            "stake8_shop_locations": [key for i, (key, value) in enumerate(self.shop_locations.items()) if str(value).__contains__(number_to_stake[8]) and i < self.options.shop_items.value + max_shop_items * 7],
+            "stake1_shop_locations": get_addresses_from_region("Shop White Stake")[0],
+            "stake2_shop_locations": get_addresses_from_region("Shop Red Stake")[0],
+            "stake3_shop_locations": get_addresses_from_region("Shop Green Stake")[0],
+            "stake4_shop_locations": get_addresses_from_region("Shop Black Stake")[0],
+            "stake5_shop_locations": get_addresses_from_region("Shop Blue Stake")[0],
+            "stake6_shop_locations": get_addresses_from_region("Shop Purple Stake")[0], 
+            "stake7_shop_locations": get_addresses_from_region("Shop Orange Stake")[0], 
+            "stake8_shop_locations": get_addresses_from_region("Shop Gold Stake")[0],
             "consumable_pool_locations": [key for key, _ in self.consumable_locations.items()],
             "jokerbundles": self.joker_bundles,
             "tarot_bundles": self.tarot_bundles,
