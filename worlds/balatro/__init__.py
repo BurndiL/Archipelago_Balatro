@@ -146,13 +146,12 @@ class BalatroWorld(World):
         # Consumable Bundles
         if (self.options.tarot_bundle == TarotBundle.option_custom_bundles):
             if len(self.options.custom_tarot_bundles.value) == 0:
-                raise OptionError("No Custom Tarots Specified. To avoid this turn off custom tarot bundles")
-            
+                raise OptionError(
+                    "No Custom Tarots Specified. To avoid this turn off custom tarot bundles")
+
             if len(self.options.custom_tarot_bundles.value) > 5:
                 raise OptionError("Too many custom Tarot Bundles specified.")
-            
-            
-            
+
             self.tarot_bundles = get_bundles_from_option(
                 self.options.custom_tarot_bundles.value)
             for index, value in enumerate(self.tarot_bundles):
@@ -162,12 +161,12 @@ class BalatroWorld(World):
 
         if (self.options.planet_bundle == PlanetBundle.option_custom_bundles):
             if len(self.options.custom_planet_bundles.value) == 0:
-                raise OptionError("No Custom Planets Specified. To avoid this turn off custom planet bundles")
-            
+                raise OptionError(
+                    "No Custom Planets Specified. To avoid this turn off custom planet bundles")
+
             if len(self.options.custom_tarot_bundles.value) > 5:
                 raise OptionError("Too many custom Planet Bundles specified.")
-            
-            
+
             self.planet_bundles = get_bundles_from_option(
                 self.options.custom_planet_bundles.value)
             if (value).__contains__(item_name_to_id["Archipelago Belt"]):
@@ -176,22 +175,24 @@ class BalatroWorld(World):
 
         if (self.options.spectral_bundle == SpectralBundle.option_custom_bundles):
             if len(self.options.custom_spectral_bundles.value) == 0:
-                raise OptionError("No Custom Spectrals Specified. To avoid this turn off custom spectral bundles")
-            
+                raise OptionError(
+                    "No Custom Spectrals Specified. To avoid this turn off custom spectral bundles")
+
             if len(self.options.custom_tarot_bundles.value) > 5:
-                raise OptionError("Too many custom Spectral Bundles specified.")
-            
+                raise OptionError(
+                    "Too many custom Spectral Bundles specified.")
+
             self.spectral_bundles = get_bundles_from_option(
                 self.options.custom_spectral_bundles.value)
             if (value).__contains__(item_name_to_id["Archipelago Spectral"]):
                 self.bundle_with_custom_spectral = "Spectral Bundle " + \
                     str(index+1)
-                    
-                   
-        # make consumable pool accessible as soon as possible
-        self.multiworld.local_early_items[self.player][random.choice(["Archipelago Tarot", "Archipelago Belt"])] = 1        
-        self.multiworld.local_early_items[self.player][random.choice([self.bundle_with_custom_tarot, self.bundle_with_custom_planet])] = 1
 
+        # make consumable pool accessible as soon as possible
+        self.multiworld.local_early_items[self.player][random.choice(
+            ["Archipelago Tarot", "Archipelago Belt"])] = 1
+        self.multiworld.local_early_items[self.player][random.choice(
+            [self.bundle_with_custom_tarot, self.bundle_with_custom_planet])] = 1
 
     def create_items(self):
         decks_to_unlock = self.options.decks_unlocked_from_start.value
@@ -553,15 +554,15 @@ class BalatroWorld(World):
             "required_stake": stake_to_number[self.required_stake],
             "included_stakes": [stake_to_number.get(key) for key in self.playable_stakes],
             "included_decks": [deck_name_to_key.get(key) for key in self.playable_decks],
-            "stake1_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[1])],
-            "stake2_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[2])],
-            "stake3_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[3])],
-            "stake4_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[4])],
-            "stake5_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[5])],
-            "stake6_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[6])],
-            "stake7_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[7])],
-            "stake8_shop_locations": [key for key, value in self.shop_locations.items() if str(value).__contains__(number_to_stake[8])],
-            "consumable_pool_locations" : [key for key, _ in self.consumable_locations.items()], 
+            "stake1_shop_locations": [key for i, (key, value) in enumerate(self.shop_locations.items()) if str(value).__contains__(number_to_stake[1]) and i < self.options.shop_items.value],
+            "stake2_shop_locations": [key for i, (key, value) in enumerate(self.shop_locations.items()) if str(value).__contains__(number_to_stake[2]) and i < self.options.shop_items.value + max_shop_items],
+            "stake3_shop_locations": [key for i, (key, value) in enumerate(self.shop_locations.items()) if str(value).__contains__(number_to_stake[3]) and i < self.options.shop_items.value + max_shop_items * 2],
+            "stake4_shop_locations": [key for i, (key, value) in enumerate(self.shop_locations.items()) if str(value).__contains__(number_to_stake[4]) and i < self.options.shop_items.value + max_shop_items * 3],
+            "stake5_shop_locations": [key for i, (key, value) in enumerate(self.shop_locations.items()) if str(value).__contains__(number_to_stake[5]) and i < self.options.shop_items.value + max_shop_items * 4],
+            "stake6_shop_locations": [key for i, (key, value) in enumerate(self.shop_locations.items()) if str(value).__contains__(number_to_stake[6]) and i < self.options.shop_items.value + max_shop_items * 5],
+            "stake7_shop_locations": [key for i, (key, value) in enumerate(self.shop_locations.items()) if str(value).__contains__(number_to_stake[7]) and i < self.options.shop_items.value + max_shop_items * 6],
+            "stake8_shop_locations": [key for i, (key, value) in enumerate(self.shop_locations.items()) if str(value).__contains__(number_to_stake[8]) and i < self.options.shop_items.value + max_shop_items * 7],
+            "consumable_pool_locations": [key for key, _ in self.consumable_locations.items()],
             "jokerbundles": self.joker_bundles,
             "tarot_bundles": self.tarot_bundles,
             "planet_bundles": self.planet_bundles,
