@@ -321,35 +321,18 @@ class Traps(Choice):
 @dataclass
 class BalatroOptions(PerGameCommonOptions):
 
-    # goal
+    # goals
     goal: Goal
     ante_win_goal: BeatAnteToWin
     decks_win_goal: DecksToWin
     unique_deck_win_goal: UniqueDeckWins
     jokers_unlock_goal: JokerGoal
     required_stake_for_goal: RequiredStakeForGoal
-
-    # modifiers
-    joker_bundles: JokerBundles
-    joker_bundle_size : JokerBundleSize
-    tarot_bundle: TarotBundle
-    custom_tarot_bundles : CustomTarotBundles
-    planet_bundle: PlanetBundle
-    custom_planet_bundles : CustomPlanetBundles
-    spectral_bundle: SpectralBundle
-    custom_spectral_bundles : CustomSpectralBundles
-
-    remove_or_debuff_jokers: RemoveOrDebuffJokers
-    remove_or_debuff_consumables: RemoveOrDebuffConsumables
-
-    # deathlink
-    deathlink: DeathLink
-
+    
     # decks
     include_decksMode: IncludeDecksMode
     include_deckChoice: IncludeDecksList
     include_deckNumber: IncludeDecksNumber
-    decks_unlocked_from_start: DecksUnlockedFromStart
 
     # stakes
     stake_unlock_mode: StakeUnlockMode
@@ -357,13 +340,31 @@ class BalatroOptions(PerGameCommonOptions):
     include_stakesList: IncludeStakeList
     include_stakesNumber: IncludeStakesNumber
 
+    # jokers 
+    joker_bundles: JokerBundles
+    joker_bundle_size : JokerBundleSize
+    remove_or_debuff_jokers: RemoveOrDebuffJokers
+    
+    # consumables    
+    tarot_bundle: TarotBundle
+    custom_tarot_bundles : CustomTarotBundles
+    planet_bundle: PlanetBundle
+    custom_planet_bundles : CustomPlanetBundles
+    spectral_bundle: SpectralBundle
+    custom_spectral_bundles : CustomSpectralBundles
+    remove_or_debuff_consumables: RemoveOrDebuffConsumables
+
     # items
+    decks_unlocked_from_start: DecksUnlockedFromStart
     filler_jokers: FillerJokers
-    shop_items: ShopItems
     ap_consumable_items: ArchipelagoConsumableItems
+    permanent_filler: OpFillerAmount
+    shop_items: ShopItems
     minimum_price: MinimumShopPrice
     maximum_price: MaximumShopPrice
-    permanent_filler: OpFillerAmount
+
+    # deathlink
+    deathlink: DeathLink
 
     # traps
     trap_amount: Traps

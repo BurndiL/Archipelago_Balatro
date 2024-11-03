@@ -74,6 +74,8 @@ class BalatroWorld(World):
     bundle_with_custom_spectral = "Spectral Bundle"
 
     itempool: Dict[str, int]
+    
+    distributed_fillers = dict()
 
     def generate_early(self):
         # decks
@@ -374,6 +376,13 @@ class BalatroWorld(World):
             classification = ItemClassification.filler
 
         # print(item_name + str(classification))
+        
+        if classification is ItemClassification.filler:
+            if self.distributed_fillers.get(item_name) is None:
+                self.distributed_fillers[item_name] = 1
+            else:
+                self.distributed_fillers[item_name] += 1
+        
         return BalatroItem(item_name, classification, item.code, self.player)
 
     def create_regions(self) -> None:
@@ -579,5 +588,6 @@ class BalatroWorld(World):
             "stake_unlock_mode": self.options.stake_unlock_mode.value,
             "remove_jokers": bool(self.options.remove_or_debuff_jokers),
             "remove_consumables": bool(self.options.remove_or_debuff_consumables),
+            "distributed_fillers" : self.distributed_fillers
         }
         return base_data
