@@ -112,7 +112,7 @@ class BalatroWorld(World):
             self.playable_stakes = list(
                 map(lambda x: number_to_stake[x], unsorted_stakes))
 
-        if list(self.options.required_stake_for_goal.value)[0] in self.playable_stakes:
+        if len(list(self.options.required_stake_for_goal.value)) > 0 and list(self.options.required_stake_for_goal.value)[0] in self.playable_stakes:
             self.required_stake = list(
                 self.options.required_stake_for_goal.value)[0]
         else:

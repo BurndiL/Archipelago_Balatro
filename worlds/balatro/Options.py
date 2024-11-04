@@ -65,7 +65,7 @@ class JokerGoal(Range):
 
 class RequiredStakeForGoal(OptionSet):
     """The required stake for your goal.
-    If the stake specified is not in the playable stakes it will default to the highest one.
+    If no stake is specified or the stake specified is not in the playable stakes it will default to the highest playable one.
     If your goal isn't 'Win with jokers on stake' or 'beat decks on stake', this setting can be ignored."""
     display_name = "Required Stake for goal"
     default = ['White Stake']
