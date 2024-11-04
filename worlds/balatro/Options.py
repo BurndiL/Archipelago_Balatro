@@ -206,7 +206,7 @@ class IncludeStakesMode(Choice):
     option_all = 0
     option_choose = 1
     option_number = 2
-    default = option_number
+    default = option_choose
 
 
 class IncludeStakeList(OptionSet):
