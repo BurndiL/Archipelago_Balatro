@@ -444,7 +444,7 @@ class Context:
 
         self.slot_info = decoded_obj["slot_info"]
         self.games = {slot: slot_info.game for slot, slot_info in self.slot_info.items()}
-        self.groups = {slot: slot_info.group_members for slot, slot_info in self.slot_info.items()
+        self.groups = {slot: set(slot_info.group_members) for slot, slot_info in self.slot_info.items()
                        if slot_info.type == SlotType.group}
 
         self.clients = {0: {}}
@@ -743,16 +743,17 @@ class Context:
                 concerns[player].append(data)
             if not hint.local and data not in concerns[hint.finding_player]:
                 concerns[hint.finding_player].append(data)
-            # remember hints in all cases
 
-            # since hints are bidirectional, finding player and receiving player,
-            # we can check once if hint already exists
-            if hint not in self.hints[team, hint.finding_player]:
-                self.hints[team, hint.finding_player].add(hint)
-                new_hint_events.add(hint.finding_player)
-                for player in self.slot_set(hint.receiving_player):
-                    self.hints[team, player].add(hint)
-                    new_hint_events.add(player)
+            # only remember hints that were not already found at the time of creation
+            if not hint.found:
+                # since hints are bidirectional, finding player and receiving player,
+                # we can check once if hint already exists
+                if hint not in self.hints[team, hint.finding_player]:
+                    self.hints[team, hint.finding_player].add(hint)
+                    new_hint_events.add(hint.finding_player)
+                    for player in self.slot_set(hint.receiving_player):
+                        self.hints[team, player].add(hint)
+                        new_hint_events.add(player)
 
             self.logger.info("Notice (Team #%d): %s" % (team + 1, format_hint(self, team, hint)))
         for slot in new_hint_events:
@@ -1059,21 +1060,37 @@ def send_items_to(ctx: Context, team: int, target_slot: int, *items: NetworkItem
 
 def register_location_checks(ctx: Context, team: int, slot: int, locations: typing.Iterable[int],
                              count_activity: bool = True):
+    slot_locations = ctx.locations[slot]
     new_locations = set(locations) - ctx.location_checks[team, slot]
-    new_locations.intersection_update(ctx.locations[slot])  # ignore location IDs unknown to this multidata
+    new_locations.intersection_update(slot_locations)  # ignore location IDs unknown to this multidata
     if new_locations:
         if count_activity:
             ctx.client_activity_timers[team, slot] = datetime.datetime.now(datetime.timezone.utc)
+
+        sortable: list[tuple[int, int, int, int]] = []
         for location in new_locations:
-            item_id, target_player, flags = ctx.locations[slot][location]
+            # extract all fields to avoid runtime overhead in LocationStore
+            item_id, target_player, flags = slot_locations[location]
+            # sort/group by receiver and item
+            sortable.append((target_player, item_id, location, flags))
+
+        info_texts: list[dict[str, typing.Any]] = []
+        for target_player, item_id, location, flags in sorted(sortable):
             new_item = NetworkItem(item_id, location, slot, flags)
             send_items_to(ctx, team, target_player, new_item)
 
             ctx.logger.info('(Team #%d) %s sent %s to %s (%s)' % (
                 team + 1, ctx.player_names[(team, slot)], ctx.item_names[ctx.slot_info[target_player].game][item_id],
                 ctx.player_names[(team, target_player)], ctx.location_names[ctx.slot_info[slot].game][location]))
-            info_text = json_format_send_event(new_item, target_player)
-            ctx.broadcast_team(team, [info_text])
+            if len(info_texts) >= 140:
+                # split into chunks that are close to compression window of 64K but not too big on the wire
+                # (roughly 1300-2600 bytes after compression depending on repetitiveness)
+                ctx.broadcast_team(team, info_texts)
+                info_texts.clear()
+            info_texts.append(json_format_send_event(new_item, target_player))
+        ctx.broadcast_team(team, info_texts)
+        del info_texts
+        del sortable
 
         ctx.location_checks[team, slot] |= new_locations
         send_new_items(ctx)
@@ -1887,7 +1904,8 @@ async def process_client_cmd(ctx: Context, client: Client, args: dict):
             for location in args["locations"]:
                 if type(location) is not int:
                     await ctx.send_msgs(client,
-                                        [{'cmd': 'InvalidPacket', "type": "arguments", "text": 'LocationScouts',
+                                        [{'cmd': 'InvalidPacket', "type": "arguments",
+                                          "text": 'Locations has to be a list of integers',
                                           "original_cmd": cmd}])
                     return
 
@@ -1914,7 +1932,7 @@ async def process_client_cmd(ctx: Context, client: Client, args: dict):
             hint = ctx.get_hint(client.team, player, location)
             if not hint:
                 return  # Ignored safely
-            if hint.receiving_player != client.slot:
+            if client.slot not in ctx.slot_set(hint.receiving_player):
                 await ctx.send_msgs(client,
                                     [{'cmd': 'InvalidPacket', "type": "arguments", "text": 'UpdateHint: No Permission',
                                       "original_cmd": cmd}])
@@ -1928,6 +1946,11 @@ async def process_client_cmd(ctx: Context, client: Client, args: dict):
                 await ctx.send_msgs(client,
                                     [{'cmd': 'InvalidPacket', "type": "arguments",
                                       "text": 'UpdateHint: Invalid Status', "original_cmd": cmd}])
+                return
+            if status == HintStatus.HINT_FOUND:
+                await ctx.send_msgs(client,
+                                    [{'cmd': 'InvalidPacket', "type": "arguments",
+                                      "text": 'UpdateHint: Cannot manually update status to "HINT_FOUND"', "original_cmd": cmd}])
                 return
             new_hint = new_hint.re_prioritize(ctx, status)
             if hint == new_hint:
@@ -1985,6 +2008,7 @@ async def process_client_cmd(ctx: Context, client: Client, args: dict):
             args["cmd"] = "SetReply"
             value = ctx.stored_data.get(args["key"], args.get("default", 0))
             args["original_value"] = copy.copy(value)
+            args["slot"] = client.slot
             for operation in args["operations"]:
                 func = modify_functions[operation["operation"]]
                 value = func(value, operation["value"])
@@ -2378,6 +2402,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--cert_key', help="Path to SSL Certificate Key file")
     parser.add_argument('--loglevel', default=defaults["loglevel"],
                         choices=['debug', 'info', 'warning', 'error', 'critical'])
+    parser.add_argument('--logtime', help="Add timestamps to STDOUT",
+                        default=defaults["logtime"], action='store_true')
     parser.add_argument('--location_check_points', default=defaults["location_check_points"], type=int)
     parser.add_argument('--hint_cost', default=defaults["hint_cost"], type=int)
     parser.add_argument('--disable_item_cheat', default=defaults["disable_item_cheat"], action='store_true')
@@ -2458,7 +2484,9 @@ def load_server_cert(path: str, cert_key: typing.Optional[str]) -> "ssl.SSLConte
 
 
 async def main(args: argparse.Namespace):
-    Utils.init_logging("Server", loglevel=args.loglevel.lower())
+    Utils.init_logging(name="Server",
+                       loglevel=args.loglevel.lower(),
+                       add_timestamp=args.logtime)
 
     ctx = Context(args.host, args.port, args.server_password, args.password, args.location_check_points,
                   args.hint_cost, not args.disable_item_cheat, args.release_mode, args.collect_mode,
