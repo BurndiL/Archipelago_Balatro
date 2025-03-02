@@ -531,6 +531,13 @@ def get_category(item_name: str) -> str:
         return "Spectral"
     if is_joker(item_name) or is_joker_bundle(item_name):
         return "Joker"
+    if is_voucher(item_name):
+        return "Voucher"
+    if is_deck(item_name):
+        return "Deck"
+    if is_stake_per_deck(item_name) or is_stake(item_name):
+        return "Stake"
+    
     return "Other"
 
 

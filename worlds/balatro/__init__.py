@@ -353,7 +353,7 @@ class BalatroWorld(World):
                     item_id_to_name[trap_id + offset], ItemClassification.trap))
             else:
                 filler_id = 310
-                
+
                 filler_classification = ItemClassification.filler
                 if op_filler_max > 0:
                     filler_classification = ItemClassification.useful
@@ -737,7 +737,7 @@ class BalatroWorld(World):
         add_unlock_location("Unlock Canio (Find Canio using The Soul)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
                             lambda state: state.has(bundle_with_spectral("The Soul"), self.player) and state.has(bundle_with_joker("Caino"), self.player) and
                             state.has_any(list(["Arcana Pack", "Jumbo Arcana Pack", "Mega Arcana Pack"]), self.player))
-        
+
         counter += 1
         add_unlock_location("Unlock Triboulet (Find Triboulet using The Soul)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
                             lambda state: state.has(bundle_with_spectral("The Soul"), self.player) and state.has(bundle_with_joker("Triboulet"), self.player) and
@@ -753,12 +753,246 @@ class BalatroWorld(World):
                             lambda state: state.has(bundle_with_spectral("The Soul"), self.player) and state.has(bundle_with_joker("Chicot"), self.player) and
                             state.has_any(list(["Arcana Pack", "Jumbo Arcana Pack", "Mega Arcana Pack"]), self.player))
 
-
         counter += 1
         add_unlock_location("Unlock Perkeo (Find Perkeo using The Soul)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
                             lambda state: state.has(bundle_with_spectral("The Soul"), self.player) and state.has(bundle_with_joker("Perkeo"), self.player) and
                             state.has_any(list(["Arcana Pack", "Jumbo Arcana Pack", "Mega Arcana Pack"]), self.player))
 
+        # Voucher Unlocks
+        counter = 1
+        add_unlock_location("Unlock Overstock + (Spend a total of $2500)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
+                            lambda state: True)
+
+        counter += 1
+        add_unlock_location("Unlock Liquidation (Redeem at least 10 voucher cards in one run)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
+                            lambda state: state.has_group("Voucher", self.player, 10))
+
+        counter += 1
+        add_unlock_location("Unlock Glow Up (Have at least 5 joker cards with edition effect)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
+                            lambda state: state.has_group("Joker", self.player))
+
+        counter += 1
+        add_unlock_location("Unlock Reroll Glut (Reroll the shop a total of 100 times)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
+                            lambda state: True)
+
+        counter += 1
+        add_unlock_location("Unlock Omen Globe (Use a total of 25 Tarot cards from booster packs)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
+                            lambda state: state.has_any(list(["Arcana Pack", "Jumbo Arcana Pack", "Mega Arcana Pack"]), self.player) and state.has_group("Tarot", self.player))
+
+        counter += 1
+        add_unlock_location("Unlock Observatory (Use a total of 25 Planet cards from booster packs)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
+                            lambda state: state.has_any(list(["Celestial Pack", "Jumbo Celestial Pack", "Mega Celestial Pack"]), self.player) and state.has_group("Planet", self.player))
+
+        counter += 1
+        add_unlock_location("Unlock Nacho Tong (Play a total of 2500 cards)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
+                            lambda state: True)
+
+        counter += 1
+        add_unlock_location("Unlock Recyclomancy (Discard a total of 2500 cards)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
+                            lambda state: True)
+
+        counter += 1
+        add_unlock_location("Unlock Tarot Tycoon (Buy a total of 50 Tarot cards from the shop)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
+                            lambda state: state.has_group("Tarot", self.player))
+
+        counter += 1
+        add_unlock_location("Unlock Planet Tycoon (Buy a total of 50 Planet cards from the shop)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
+                            lambda state: state.has_group("Planet", self.player))
+
+        counter += 1
+        add_unlock_location("Unlock Money Tree (Max out the interest per round earnings for ten consecutive rounds)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
+                            lambda state: True)
+
+        counter += 1
+        add_unlock_location("Unlock Antimatter (Redeem Blank 10 total times)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
+                            lambda state: state.has("Blank/Antimatter 1", self.player) or state.has("Blank/Antimatter 2", self.player))
+
+        counter += 1
+        add_unlock_location("Unlock Illusion (Buy a total of 20 Playing cards from the shop)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
+                            lambda state: state.has("Magic Trick/Illusion 1", self.player) or state.has("Magic Trick/Illusion 2", self.player))
+
+        counter += 1
+        add_unlock_location("Unlock Petroglyph (Reach Ante level 12)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+
+        counter += 1
+        add_unlock_location("Unlock Retcon (Discover 25 Blinds)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
+                            lambda state: True)
+
+        counter += 1
+        add_unlock_location("Unlock Palette (Reduce your hand size down to 5 cards)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_spectral("Ectoplasm"), self.player) and state.has_any(
+                                list(["Spectral Pack", "Jumbo Spectral Pack", "Mega Spectral Pack"]), self.player)
+                            and state.has(bundle_with_joker("Merry Andy"), self.player))
+
+        counter = 1
+        if ("Gold Stake" in self.playable_stakes):
+            add_unlock_location("High Stakes Achievement (Clear Gold Stakes on a deck)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                                lambda state: can_reach_count(state, get_locations_where(None, 8, 8)))
+
+        counter += 1
+        add_unlock_location("Flushed Achievement (Play a 5 card wild card flush)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_tarot("The Lovers"), self.player))
+
+        counter += 1
+        add_unlock_location("ROI Achievement (Buy 5 vouchers by Ante 4)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: state.has_group("Voucher", self.player, 5) and can_reach_count(state, get_locations_where(None, 4, None)))
+
+        counter += 1
+        add_unlock_location("Shattered Achievement (Break 2 Glass Cards in a single hand)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_tarot("Justice"), self.player))
+
+        counter += 1
+        add_unlock_location("Royale Achievement (Play a Royal Flush)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_tarot("The World"), self.player) or state.has(
+                                bundle_with_tarot("The Sun"), self.player)
+                            or state.has(bundle_with_tarot("The Moon"), self.player) or state.has(bundle_with_tarot("The Star"), self.player))
+
+        counter += 1
+        add_unlock_location("Retrograde Achievement (Get any poker hand to level 10)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: state.has_group("Planet", self.player) or state.has(bundle_with_joker("Burnt Joker"), self.player) or state.has(bundle_with_joker("Space Joker"), self.player))
+
+        counter += 1
+        add_unlock_location("Tiny Hands Achievement (Thin your deck down to 20 or fewer cards)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_tarot("The Hanged Man"), self.player) or
+                            (state.has(bundle_with_spectral("Immolate"), self.player) and state.has_any(list(["Spectral Pack", "Jumbo Spectral Pack", "Mega Spectral Pack"]), self.player)))
+
+        counter += 1
+        add_unlock_location("Big Hands Achievement (Have 80 or more cards in your deck)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: (state.has_any(list(["Spectral Pack", "Jumbo Spectral Pack", "Mega Spectral Pack"]), self.player) and
+                            (state.has(bundle_with_spectral("Cryptid"), self.player) or state.has(bundle_with_spectral("Familiar"), self.player) or
+                             state.has(bundle_with_spectral("Grim"), self.player) or state.has(bundle_with_spectral("Incantation"), self.player))) or
+                            state.has(bundle_with_joker("DNA"), self.player) or state.has(bundle_with_joker("Marble Joker"), self.player) or
+                            state.has_any(list(["Standard Pack", "Jumbo Standard Pack", "Mega Standard Pack"]), self.player))
+
+        counter += 1
+        add_unlock_location("You Get What You Get Achievement (Win a run without rerolling the shop)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: True)
+
+        counter += 1
+        # TODO: add challenge implementation
+        add_unlock_location("Rule Bender Achievement (Complete any challenge run)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: True)
+
+        counter += 1
+        # TODO: add challenge implementation
+        add_unlock_location("Rule Breaker Achievement (Complete any challenge run)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: True)
+
+        counter += 1
+        add_unlock_location("Legendary Achievement (Discover a Legendary Joker)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_spectral("The Soul"), self.player) and
+                            state.has_any(list([bundle_with_joker("Perkeo"), bundle_with_joker("Caino"), bundle_with_joker("Triboulet"), bundle_with_joker("Yorick"), bundle_with_joker("Chicot"), ]), self.player) and
+                            state.has_any(list(["Arcana Pack", "Jumbo Arcana Pack", "Mega Arcana Pack"]), self.player))
+
+        counter += 1
+        add_unlock_location("Clairvoyance Achievement (Discover every Spectral card)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: state.has_all(list([bundle_with_spectral("Familiar"), bundle_with_spectral("Grim"), bundle_with_spectral("Incantation"),
+                                                              bundle_with_spectral(
+                                                                  "Talisman"), bundle_with_spectral("Aura"),
+                                                              bundle_with_spectral("Wraith"), bundle_with_spectral("Sigil"), bundle_with_spectral(
+                                                                  "Ouija"), bundle_with_spectral("Ectoplasm"), bundle_with_spectral("Immolate"),
+                                                              bundle_with_spectral(
+                                                                  "Ankh"), bundle_with_spectral("Deja Vu"),
+                                                              bundle_with_spectral("Hex"), bundle_with_spectral(
+                                                                  "Trance"), bundle_with_spectral("Medium"),
+                                                              bundle_with_spectral("Cryptid"), bundle_with_spectral("The Soul"), bundle_with_spectral("Black Hole")]), self.player) and
+                            state.has_any(list(["Arcana Pack", "Jumbo Arcana Pack", "Mega Arcana Pack"]), self.player) and
+                            # for black hole
+                            state.has_any(list(["Celestial Pack", "Jumbo Celestial Pack", "Mega Celestial Pack"]), self.player))
+
+        counter += 1
+        add_unlock_location("Extreme Couponer Achievement (Discover every Voucher)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: state.has_group("Voucher", self.player, len(vouchers)))
+
+        counter += 1
+        add_unlock_location("Completionist Achievement (Discover your entire collection)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: state.can_reach_location("Clairvoyance Achievement (Discover every Spectral card)", self.player) and
+                            state.can_reach_location("Unlock Astronomer (Discover every Planet card)", self.player) and
+                            state.can_reach_location("Unlock Cartomancer (Discover every Tarot card)", self.player) and
+                            state.has_all(list(["Arcana Pack", "Jumbo Arcana Pack", "Mega Arcana Pack"]), self.player) and
+                            state.has_all(list(["Spectral Pack", "Jumbo Spectral Pack", "Mega Spectral Pack"]), self.player) and
+                            state.has_all(list(["Celestial Pack", "Jumbo Celestial Pack", "Mega Celestial Pack"]), self.player) and
+                            state.has_all(list(["Standard Pack", "Jumbo Standard Pack", "Mega Standard Pack"]), self.player) and
+                            state.has_group("Deck", self.player, len(self.playable_decks)))
+
+        counter += 1
+        if ("Gold Stake" in self.playable_stakes):
+            add_unlock_location("Completionist+ Achievement (Win every deck at Gold Stake difficulty)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                                lambda state: can_reach_count(state, get_locations_where(None, 8, 8), len(self.playable_decks)))
+
+        counter += 1
+        if ("Gold Stake" in self.playable_stakes):
+            add_unlock_location("Completionist++ Achievement (Earn a Gold Sticker on every Joker)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                                lambda state: can_reach_count(state, get_locations_where(None, 8, 8)) and
+                                (state.has_all(list([key for _, key in jokers if key not in self.options.filler_jokers]), self.player) or state.has_all(list([key for _, key in self.joker_bundles]), self.player)))
+
+        counter += 1
+        add_unlock_location("Ante Up! Achievement (Reach Ante 4)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 4, None)))
+
+        counter += 1
+        add_unlock_location("Ante Upper! Achievement (Reach Ante 8)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+
+        counter += 1
+        add_unlock_location("Heads Up Achievement (Win a run)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+
+        counter += 1
+        if "Red Stake" in self.playable_stakes or "Green Stake" in self.playable_stakes or "Black Stake" in self.playable_stakes or "Blue Stake" in self.playable_stakes or \
+                "Purple Stake" in self.playable_stakes or "Orange Stake" in self.playable_stakes or "Gold Stake" in self.playable_stakes:
+            add_unlock_location("Low Stakes Achievement (Win a run on at least Red Stakes difficulty)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                                lambda state: can_reach_count(state, get_locations_where(None, 8, 2)) or can_reach_count(
+                                    state, get_locations_where(None, 8, 3)) or can_reach_count(state, get_locations_where(None, 8, 4))
+                                or can_reach_count(state, get_locations_where(None, 8, 5)) or can_reach_count(state, get_locations_where(None, 8, 6)) or can_reach_count(state, get_locations_where(None, 8, 7))
+                                or can_reach_count(state, get_locations_where(None, 8, 8)))
+            
+        counter += 1
+        if "Black Stake" in self.playable_stakes or "Blue Stake" in self.playable_stakes or \
+                "Purple Stake" in self.playable_stakes or "Orange Stake" in self.playable_stakes or "Gold Stake" in self.playable_stakes:
+            add_unlock_location("Mid Stakes Achievement (Win a run on at least Black Stakes difficulty)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                                lambda state: can_reach_count(state, get_locations_where(None, 8, 4))
+                                or can_reach_count(state, get_locations_where(None, 8, 5)) or can_reach_count(state, get_locations_where(None, 8, 6)) or can_reach_count(state, get_locations_where(None, 8, 7))
+                                or can_reach_count(state, get_locations_where(None, 8, 8)))
+            
+        counter += 1
+        add_unlock_location("Card Player Achievement (Play at least 2500 cards)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: True)
+        
+        counter += 1
+        add_unlock_location("Card Discarder Achievement (Discard at least 2500 cards)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: True)
+        
+        counter += 1
+        add_unlock_location("Nest Egg Achievement (Have $400 or more)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: lambda state: state.has(bundle_with_tarot("The Hermit"), self.player) and state.has(bundle_with_tarot("Temperance"), self.player))
+
+
+        counter += 1
+        add_unlock_location("Speedrunner Achievement (Win a run with 12 or fewer rounds)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+        
+        counter += 1
+        add_unlock_location("10K Achievement (Score 10,000 Chips in a single hand)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+        
+        counter += 1
+        add_unlock_location("1,000K Achievement (Score 100,000,000 Chips in a single hand)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+        
+        counter += 1
+        add_unlock_location("100,000K Achievement (Score 100,000,000,000 Chips in a single hand)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+        
+        counter += 1
+        add_unlock_location("Astronomy Achievement (Discover every Planet Card)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: state.can_reach_location("Unlock Astronomer (Discover every Planet card)", self.player))
+        
+        counter += 1
+        add_unlock_location("Cartomancy Achievement (Discover every Tarot Card)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: state.can_reach_location("Unlock Cartomancer (Discover every Tarot card)", self.player))
+        
         # GOALS
 
         if self.options.goal.value == Goal.option_beat_decks:

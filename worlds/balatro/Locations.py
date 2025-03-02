@@ -86,3 +86,11 @@ for j in range(16):
     balatro_location_name_to_id[location_name] = location_id
     balatro_location_id_to_name[location_id] = location_name
     
+    
+for j in range(31):
+    prev_id += 1
+    location_name = "Achievement Unlock " + str(j+1) 
+    location_id = prev_id
+
+    balatro_location_name_to_id[location_name] = location_id
+    balatro_location_id_to_name[location_id] = location_name
