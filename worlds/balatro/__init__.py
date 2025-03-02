@@ -353,7 +353,10 @@ class BalatroWorld(World):
                     item_id_to_name[trap_id + offset], ItemClassification.trap))
             else:
                 filler_id = 310
+                
+                filler_classification = ItemClassification.filler
                 if op_filler_max > 0:
+                    filler_classification = ItemClassification.useful
                     filler_id = op_filler + 300
                     op_filler += 1
                     if op_filler == 8:
@@ -365,7 +368,7 @@ class BalatroWorld(World):
                     filler_id = self.random.randint(310, 321)
 
                 self.itempool.append(self.create_item(
-                    item_id_to_name[filler_id + offset], ItemClassification.filler))
+                    item_id_to_name[filler_id + offset], filler_classification))
 
         self.multiworld.itempool += self.itempool
 
