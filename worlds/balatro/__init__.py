@@ -9,7 +9,7 @@ from .Items import item_name_to_id, item_id_to_name, item_table, is_joker, is_jo
     stake_to_number, number_to_stake, is_tarot, is_planet, is_spectral, item_groups
 from .BalatroDecks import deck_id_to_name, deck_name_to_key
 import math
-from worlds.generic.Rules import add_rule
+from worlds.generic.Rules import add_rule, CollectionRule
 from .Options import BalatroOptions, Traps, IncludeDecksMode, StakeUnlockMode, \
     IncludeStakesMode, Goal, TarotBundle, SpectralBundle, PlanetBundle
 from Options import OptionError
@@ -72,15 +72,15 @@ class BalatroWorld(World):
     bundle_with_custom_spectral = "Spectral Bundle"
 
     item_name_groups = item_groups
-     
+
     itempool: Dict[str, int]
-    
+
     distributed_fillers = dict()
 
-    def generate_early(self):       
-        
+    def generate_early(self):
+
         self.random.shuffle(self.short_mode_pool)
-        
+
         # decks
         if self.options.include_decksMode.value == IncludeDecksMode.option_all:
             self.playable_decks = [value for _,
@@ -106,6 +106,8 @@ class BalatroWorld(World):
             self.playable_stakes = playable_stake_choice[0:
                                                          self.options.include_stakesNumber.value]
         elif self.options.include_stakesMode == IncludeStakesMode.option_choose:
+            if len(self.options.include_stakesList.value) == 0:
+                raise OptionError("Must choose at least 1 playable stake.")
             self.playable_stakes = list(self.options.include_stakesList.value)
 
         if self.options.stake_unlock_mode == StakeUnlockMode.option_vanilla:
@@ -379,13 +381,13 @@ class BalatroWorld(World):
             classification = ItemClassification.filler
 
         # print(item_name + str(classification))
-        
+
         if classification is ItemClassification.filler:
             if self.distributed_fillers.get(item_name) is None:
                 self.distributed_fillers[item_name] = 1
             else:
                 self.distributed_fillers[item_name] += 1
-        
+
         return BalatroItem(item_name, classification, item.code, self.player)
 
     def create_regions(self) -> None:
@@ -513,9 +515,246 @@ class BalatroWorld(World):
                 consumable_region.locations.append(new_location)
                 self.locations_set += 1
 
-        menu_region.connect(consumable_region, None, rule=lambda state: state.has(
+        menu_region.connect(consumable_region, None, rule=lambda state: (state.has(
             "Archipelago Tarot", self.player) or state.has("Archipelago Belt", self.player) or state.has("Archipelago Spectral", self.player) or
-            state.has(self.bundle_with_custom_planet, self.player) or state.has(self.bundle_with_custom_spectral, self.player) or state.has(self.bundle_with_custom_tarot, self.player))
+            state.has(self.bundle_with_custom_planet, self.player) or state.has(self.bundle_with_custom_spectral, self.player) or state.has(self.bundle_with_custom_tarot, self.player)) and can_reach_count(state, get_locations_where(None, None, None)))
+
+        # Joker/Voucher unlocks (these are already instantiated in Locations.py but rules are only applied here)
+
+        def bundle_with_joker(joker_name: str) -> str:
+            if (self.options.joker_bundles):
+                for idx, bundle in enumerate(self.joker_bundles):
+                    if item_name_to_id[joker_name] in bundle:
+                        return "Joker Bundle " + str(idx + 1)
+            return joker_name
+
+        def bundle_with_tarot(tarot_name: str) -> str:
+            if (self.options.tarot_bundle == TarotBundle.option_one_bundle):
+                return "Tarot Bundle"
+
+            if (self.options.tarot_bundle == TarotBundle.option_custom_bundles):
+                for idx, bundle in enumerate(self.tarot_bundles):
+                    if item_name_to_id[tarot_name] in bundle:
+                        return "Tarot Bundle " + str(idx + 1)
+            return tarot_name
+
+        def bundle_with_planet(planet_name: str) -> str:
+            if (self.options.planet_bundle == PlanetBundle.option_one_bundle):
+                return "Planet Bundle"
+
+            if (self.options.planet_bundle == PlanetBundle.option_custom_bundles):
+                for idx, bundle in enumerate(self.planet_bundles):
+                    if item_name_to_id[planet_name] in bundle:
+                        return "Planet Bundle " + str(idx + 1)
+            return planet_name
+
+        def bundle_with_spectral(spectral_name: str) -> str:
+            if (self.options.spectral_bundle == SpectralBundle.option_one_bundle):
+                return "Spectral Bundle"
+
+            if (self.options.spectral_bundle == SpectralBundle.option_custom_bundles):
+                for idx, bundle in enumerate(self.spectral_bundles):
+                    if item_name_to_id[spectral_name] in bundle:
+                        return "Spectral Bundle " + str(idx + 1)
+            return spectral_name
+
+        unlocks_region = Region("Joker/Voucher Unlocks",
+                                self.player, self.multiworld)
+        menu_region.connect(unlocks_region, None, rule=lambda state: can_reach_count(
+            state, get_locations_where(None, None, None)))
+        self.multiworld.regions.append(unlocks_region)
+
+        def add_unlock_location(location_name: str, location_id: int, rule: CollectionRule):
+            new_location = BalatroLocation(
+                self.player, location_name, location_id, unlocks_region)
+            self.locations_set += 1
+            unlocks_region.locations.append(new_location)
+
+            add_rule(new_location, rule)
+
+        counter = 1
+        add_unlock_location("Unlock Golden Ticket (Play a 5 card hand that only contains Gold cards)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_tarot("The Devil"), self.player) or state.has(bundle_with_joker("Midas Mask"), self.player))
+        counter += 1
+        add_unlock_location("Unlock Mr. Bones (Lose 5 runs)",
+                            balatro_location_name_to_id["Joker Unlock " + str(counter)], lambda state: True)
+        counter += 1
+        add_unlock_location("Unlock Acrobat (Play 200 hands)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: True)
+        counter += 1
+        # maybe think about what happens if only abandoned deck unlocked? very unlikely -> not considered in logic
+        add_unlock_location("Unlock Sock and Buskin (Play a total of 500 face cards)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: True)
+        counter += 1
+        add_unlock_location("Unlock Swashbuckler (Sell a total of 20 Jokers)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has_group("Joker", self.player, 1))
+        counter += 1
+        add_unlock_location("Unlock Troubadour (Win 5 consecutive rounds with a single hand each)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: True)
+        counter += 1
+        add_unlock_location("Unlock Certificate (Have a gold card with a gold seal)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: (state.has(bundle_with_tarot("The Devil"), self.player) or state.has(bundle_with_joker("Midas Mask"), self.player)) and
+                            state.has(bundle_with_spectral("Talisman"), self.player))
+        counter += 1
+        add_unlock_location("Unlock Smeared Joker (Have 3 or more wild cards in your deck)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_tarot("The Lovers"), self.player))
+        counter += 1
+        add_unlock_location("Unlock Throwback (Continue a run from the main menu)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: True)
+        counter += 1
+        add_unlock_location("Unlock Hanging Chad (Beat a Boss Blind with a high card)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: True)
+
+        counter += 1
+        add_unlock_location("Unlock Rough Gem (Have at least 30 diamond cards in your deck)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_tarot("The Star"), self.player))
+        counter += 1
+        add_unlock_location("Unlock Bloodstone (Have at least 30 heart cards in your deck)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_tarot("The Sun"), self.player))
+        counter += 1
+        add_unlock_location("Unlock Arrowhead (Have at least 30 spade cards in your deck)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_tarot("The World"), self.player))
+        counter += 1
+        add_unlock_location("Unlock Onyx Agate (Have at least 30 club cards in your deck)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_tarot("The Moon"), self.player))
+        counter += 1
+        add_unlock_location("Unlock Glass Joker (Have 5 or more glass cards in your deck)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_tarot("Justice"), self.player))
+
+        counter += 1
+        add_unlock_location("Unlock Showman (Reach ante 4)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 4, None)))
+        counter += 1
+        add_unlock_location("Unlock Flower Pot (Reach ante 8)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+
+        counter += 1
+        add_unlock_location("Unlock Blueprint (Win a run)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+
+        counter += 1
+        add_unlock_location("Unlock Wee Joker (Win a run in 18 or fewer rounds)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+
+        counter += 1
+        add_unlock_location("Unlock Merry Andy (Win a run in 12 or fewer rounds)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+
+        counter += 1
+        add_unlock_location("Unlock Oops! All 6s (Earn at least 10,000 chips)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+
+        counter += 1
+        add_unlock_location("Unlock The Idol (In one hand, eart at least 1,000,000 chips)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+
+        counter += 1
+        add_unlock_location("Unlock Seeing Double (Play a hand that contains four 7 of clubs)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_tarot("The Moon"), self.player) or state.has(bundle_with_tarot("Death"), self.player))
+
+        counter += 1
+        add_unlock_location("Unlock Matador (Defeat a Boss Blind in one hand, without using discards)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: True)
+
+        counter += 1
+        add_unlock_location("Unlock Hit the Road (Discard 5 Jacks at the same time)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_tarot("Death"), self.player) or state.has(bundle_with_tarot("Strength"), self.player))
+
+        counter += 1
+        add_unlock_location("Unlock The Duo (Win a run without playing a pair)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+
+        counter += 1
+        add_unlock_location("Unlock The Trio (Win a run without playing a Three of a Kind)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+
+        counter += 1
+        add_unlock_location("Unlock The Family (Win a run without playing a Four of a Kind)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+
+        counter += 1
+        add_unlock_location("Unlock The Order (Win a run without playing a Straight)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+
+        counter += 1
+        add_unlock_location("Unlock The Tribe (Win a run without playing a Flush)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+
+        counter += 1
+        add_unlock_location("Unlock The Stuntman (Earn 100,000,000 chips in one hand)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+
+        counter += 1
+        add_unlock_location("Unlock Invisible Joker (Win a run without ever having more than 4 Jokers)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, get_locations_where(None, 8, None)))
+
+        counter += 1
+        add_unlock_location("Unlock Brainstorm (Discard a Royal Flush)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_tarot("The World"), self.player) or state.has(bundle_with_tarot("The Sun"), self.player) or state.has(bundle_with_tarot("The Moon"), self.player) or state.has(bundle_with_tarot("The Star"), self.player))
+
+        # added hermit and temperance requirement to make it more easy
+        counter += 1
+        add_unlock_location("Unlock Satellite (Have $400 or more)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_tarot("The Hermit"), self.player) and state.has(bundle_with_tarot("Temperance"), self.player))
+
+        counter += 1
+        add_unlock_location("Unlock Shoot the Moon (Play every heart card in your deck in a single round)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: True)
+
+        counter += 1
+        add_unlock_location("Unlock Driver's License (Enhance 16 cards in your deck)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has_any(list([bundle_with_tarot("The Magician"), bundle_with_tarot("The Empress"), bundle_with_tarot("Justice"), bundle_with_tarot("The Hierophant"), bundle_with_tarot("The Lovers"), bundle_with_tarot("The Chariot"), bundle_with_tarot("The Devil"), bundle_with_tarot("The Tower"), bundle_with_joker("Midas Mask"), bundle_with_joker("Marble Joker"), bundle_with_spectral("Familiar"), bundle_with_spectral("Grim"), bundle_with_spectral("Incantation")]), self.player))
+
+        counter += 1
+        add_unlock_location("Unlock Cartomancer (Discover every Tarot card)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has_all(list([bundle_with_tarot("The Fool"), bundle_with_tarot("The Magician"), bundle_with_tarot("The High Priestess"), bundle_with_tarot("The Empress"), bundle_with_tarot("The Emperor"),
+                                                              bundle_with_tarot("The High Priestess"), bundle_with_tarot("The Hierophant"), bundle_with_tarot(
+                                                                  "The Lovers"), bundle_with_tarot("The Chariot"), bundle_with_tarot("Justice"), bundle_with_tarot("The Hermit"),
+                                                              bundle_with_tarot("The Wheel of Fortune"), bundle_with_tarot("Strength"), bundle_with_tarot(
+                                                                  "The Hanged Man"), bundle_with_tarot("Death"), bundle_with_tarot("Temperance"),
+                                                              bundle_with_tarot("The Devil"), bundle_with_tarot("The Tower"), bundle_with_tarot("The Star"), bundle_with_tarot("The Moon"), bundle_with_tarot("The Sun"), bundle_with_tarot("Judgement"), bundle_with_tarot("The World")]), self.player))
+
+        counter += 1
+        add_unlock_location("Unlock Astronomer (Discover every Planet card)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has_all(list([bundle_with_planet("Mercury"), bundle_with_planet("Venus"), bundle_with_planet("Earth"), bundle_with_planet("Mars"), bundle_with_planet("Jupiter"),
+                                                              bundle_with_planet("Saturn"), bundle_with_planet("Uranus"), bundle_with_planet(
+                                                                  "Neptune"), bundle_with_planet("Pluto"), bundle_with_planet("Planet X"),
+                                                              bundle_with_planet("Ceres"), bundle_with_planet("Eris")]), self.player))
+
+        # consumable will also work for this, but too lazy to add to logic, also doesnt really matter
+        counter += 1
+        add_unlock_location("Unlock Burnt Joker (Sell a total of 50 cards)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has_group("Joker", self.player, 1))
+
+        counter += 1
+        add_unlock_location("Unlock Bootstraps (Have at least 2 Polychrome Jokers)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has_group("Joker", self.player, 2) and state.has(bundle_with_tarot("The Wheel of Fortune"), self.player))
+
+        counter += 1
+        add_unlock_location("Unlock Canio (Find Canio using The Soul)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_spectral("The Soul"), self.player) and state.has(bundle_with_joker("Caino"), self.player) and
+                            state.has_any(list(["Arcana Pack", "Jumbo Arcana Pack", "Mega Arcana Pack"]), self.player))
+        
+        counter += 1
+        add_unlock_location("Unlock Triboulet (Find Triboulet using The Soul)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_spectral("The Soul"), self.player) and state.has(bundle_with_joker("Triboulet"), self.player) and
+                            state.has_any(list(["Arcana Pack", "Jumbo Arcana Pack", "Mega Arcana Pack"]), self.player))
+
+        counter += 1
+        add_unlock_location("Unlock Yorick (Find Yorick using The Soul)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_spectral("The Soul"), self.player) and state.has(bundle_with_joker("Yorick"), self.player) and
+                            state.has_any(list(["Arcana Pack", "Jumbo Arcana Pack", "Mega Arcana Pack"]), self.player))
+
+        counter += 1
+        add_unlock_location("Unlock Chicot (Find Chicot using The Soul)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_spectral("The Soul"), self.player) and state.has(bundle_with_joker("Chicot"), self.player) and
+                            state.has_any(list(["Arcana Pack", "Jumbo Arcana Pack", "Mega Arcana Pack"]), self.player))
+
+
+        counter += 1
+        add_unlock_location("Unlock Perkeo (Find Perkeo using The Soul)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
+                            lambda state: state.has(bundle_with_spectral("The Soul"), self.player) and state.has(bundle_with_joker("Perkeo"), self.player) and
+                            state.has_any(list(["Arcana Pack", "Jumbo Arcana Pack", "Mega Arcana Pack"]), self.player))
 
         # GOALS
 
@@ -558,8 +797,9 @@ class BalatroWorld(World):
             min_price, max_price = max_price, min_price
 
         created_regions = self.multiworld.get_regions(self.player)
-        created_regions = list(map(lambda region: region.name, created_regions))
-        
+        created_regions = list(
+            map(lambda region: region.name, created_regions))
+
         def get_addresses_from_region(region: str):
             return list(map(lambda location: location.address, self.get_region(region).locations)) if (region in created_regions) else [],
 
@@ -577,8 +817,8 @@ class BalatroWorld(World):
             "stake3_shop_locations": get_addresses_from_region("Shop Green Stake")[0],
             "stake4_shop_locations": get_addresses_from_region("Shop Black Stake")[0],
             "stake5_shop_locations": get_addresses_from_region("Shop Blue Stake")[0],
-            "stake6_shop_locations": get_addresses_from_region("Shop Purple Stake")[0], 
-            "stake7_shop_locations": get_addresses_from_region("Shop Orange Stake")[0], 
+            "stake6_shop_locations": get_addresses_from_region("Shop Purple Stake")[0],
+            "stake7_shop_locations": get_addresses_from_region("Shop Orange Stake")[0],
             "stake8_shop_locations": get_addresses_from_region("Shop Gold Stake")[0],
             "consumable_pool_locations": [key for key, _ in self.consumable_locations.items()],
             "jokerbundles": self.joker_bundles,
@@ -592,6 +832,6 @@ class BalatroWorld(World):
             "stake_unlock_mode": self.options.stake_unlock_mode.value,
             "remove_jokers": bool(self.options.remove_or_debuff_jokers),
             "remove_consumables": bool(self.options.remove_or_debuff_consumables),
-            "distributed_fillers" : self.distributed_fillers
+            "distributed_fillers": self.distributed_fillers
         }
         return base_data
