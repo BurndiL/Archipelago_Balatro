@@ -6,15 +6,15 @@ from BaseClasses import ItemClassification, Region, Tutorial, LocationProgressTy
 from ..AutoWorld import WebWorld, World
 from .Items import item_name_to_id, item_id_to_name, item_table, is_joker, is_joker_bundle, jokers, decks, joker_bundles, offset, ItemData, BalatroItem, \
     is_deck, is_progression, is_useful, is_bundle, tarots, planets, vouchers, spectrals, is_voucher, is_booster, is_stake, is_stake_per_deck, \
-    stake_to_number, number_to_stake, is_tarot, is_planet, is_spectral, item_groups
-from .BalatroDecks import deck_id_to_name, deck_name_to_key
+    stake_to_number, number_to_stake, is_tarot, is_planet, is_spectral, item_groups, is_challenge_unlock
+from .BalatroDecks import deck_id_to_name, deck_name_to_key, challenge_id_to_name
 import math
 from worlds.generic.Rules import add_rule, CollectionRule
 from .Options import BalatroOptions, Traps, IncludeDecksMode, StakeUnlockMode, \
-    IncludeStakesMode, Goal, TarotBundle, SpectralBundle, PlanetBundle
+    IncludeStakesMode, Goal, TarotBundle, SpectralBundle, PlanetBundle, ChallengeUnlockMode, IncludeChallenges
 from Options import OptionError
 from .Locations import BalatroLocation, balatro_location_id_to_name, balatro_location_name_to_id, \
-    balatro_location_id_to_stake, shop_id_offset, balatro_location_id_to_ante, max_shop_items, consumable_id_offset
+    balatro_location_id_to_stake, shop_id_offset, balatro_location_id_to_ante, max_shop_items, consumable_id_offset, balatro_location_id_to_blind
 
 
 class BalatroWebWorld(WebWorld):
@@ -121,7 +121,7 @@ class BalatroWorld(World):
             self.required_stake = list(
                 self.options.required_stake_for_goal.value)[0]
         else:
-            self.required_stake = self.playable_stakes[0]
+            self.required_stake = self.playable_stakes[-1]
 
         self.options.decks_win_goal.value = min(
             self.options.decks_win_goal.value, len(self.playable_decks))
@@ -306,6 +306,12 @@ class BalatroWorld(World):
 
             if (is_joker_bundle(item_name) and len(self.joker_bundles) < (item_name_to_id[item_name] - offset) - 520):
                 continue
+            
+            if is_challenge_unlock(item_name):
+                if self.options.challenge_unlock_mode != ChallengeUnlockMode.option_as_items:
+                    continue
+                if self.options.include_challenges == IncludeChallenges.option_include_none:
+                    continue
 
             if item_name in excludedItems:
                 continue
@@ -325,6 +331,9 @@ class BalatroWorld(World):
                 self.itempool.append(
                     self.create_item(item_name, classification))
 
+
+        if len(self.itempool) > self.locations_set:
+            raise OptionError("Not enough Balatro locations to generate. Consider adding more decks or stakes or enabling joker bundles. There are " + str(len(self.itempool) - self.locations_set) + " locations missing.")
         pool_count = self.locations_set
 
         # if there's any free space fill it with filler, for example traps
@@ -398,6 +407,7 @@ class BalatroWorld(World):
 
         self.multiworld.regions.append(menu_region)
         all_locations: List[BalatroLocation] = list()
+        challenge_complete_locations: List[BalatroLocation] = list()
 
         for deck in deck_id_to_name:
             deck_name = deck_id_to_name[deck]
@@ -408,7 +418,11 @@ class BalatroWorld(World):
                         location_id = balatro_location_name_to_id[location]
                         stake = balatro_location_id_to_stake[location_id]
                         ante = balatro_location_id_to_ante[location_id]
-
+                        blind = balatro_location_id_to_blind[location_id]
+                        
+                        if self.options.only_boss_blinds_are_checks.value and (blind == "Small Blind" or blind == "Big Blind"):
+                            continue 
+                        
                         new_location = BalatroLocation(
                             self.player, location, location_id, deck_region)
 
@@ -439,7 +453,7 @@ class BalatroWorld(World):
                                     number_to_stake[stake])
                                 if index != 0:
                                     add_rule(new_location, lambda state, _deck_name_=deck_name, _index_=index: state.can_reach_location(
-                                        _deck_name_ + " Ante 8 " + self.playable_stakes[_index_ - 1], self.player))
+                                        _deck_name_ + " Ante 8 " + self.playable_stakes[_index_ - 1] + " Boss Blind", self.player))
                         elif self.options.stake_unlock_mode == StakeUnlockMode.option_stake_as_item:
                             add_rule(new_location, lambda state, _stake_=stake: state.has(
                                 number_to_stake[_stake_], self.player))
@@ -469,7 +483,7 @@ class BalatroWorld(World):
 
         def get_locations_where(deck: str = None, ante: int = None, stake: int = None) -> list:
             return list([element for element in all_locations if (ante == None or element.ante == ante) and (stake == None or stake_to_number[element.stake] == stake) and (deck == None or element.deck == deck)])
-
+            
         # Shop Region
         for location in balatro_location_name_to_id:
             if str(location).startswith("Shop Item"):
@@ -516,12 +530,76 @@ class BalatroWorld(World):
                 new_location = BalatroLocation(
                     self.player, location_name, location_id, consumable_region)
                 consumable_region.locations.append(new_location)
+                
+                # balance out consumable items a bit
+                add_rule(new_location, lambda state, _require_=counter:
+                         state.has_from_list(list(jokers.values()), self.player, _require_ / 6) or
+                         state.has_from_list(list(joker_bundles.values()), self.player, _require_ / (self.options.joker_bundle_size.value * 4)))
+                
                 self.locations_set += 1
 
         menu_region.connect(consumable_region, None, rule=lambda state: (state.has(
             "Archipelago Tarot", self.player) or state.has("Archipelago Belt", self.player) or state.has("Archipelago Spectral", self.player) or
             state.has(self.bundle_with_custom_planet, self.player) or state.has(self.bundle_with_custom_spectral, self.player) or state.has(self.bundle_with_custom_tarot, self.player)) and can_reach_count(state, get_locations_where(None, None, None)))
 
+        # Challenges
+        
+        challenge_region = Region("Challenges", self.player, self.multiworld)
+        
+        if self.options.include_challenges != IncludeChallenges.option_include_none:
+            for challenge in challenge_id_to_name:
+                challenge_name = challenge_id_to_name[challenge]
+                for location in balatro_location_name_to_id:
+                    if str(location).startswith(challenge_name):
+                        
+                        #TODO implement "hard" challenge option
+                        
+                        location_id = balatro_location_name_to_id[location]
+                        ante = balatro_location_id_to_ante[location_id]
+                        blind = balatro_location_id_to_blind[location_id]
+                        
+                        if self.options.only_boss_blinds_are_checks.value and (blind == "Small Blind" or blind == "Big Blind"):
+                            continue 
+                        
+                        new_location = BalatroLocation(
+                            self.player, location, location_id, challenge_region)
+                        
+                        if (ante == 8 and blind == "Boss Blind"):
+                            challenge_complete_locations.append(new_location)
+
+                        new_location.progress_type = LocationProgressType.DEFAULT
+                        
+                        if self.options.challenge_unlock_mode == ChallengeUnlockMode.option_vanilla:
+                            if challenge > 1:
+                                add_rule(new_location, lambda state, _challenge_ = challenge: 
+                                    # if previous Challenge can be beaten then this challenge should be reachable
+                                    state.can_reach_location(challenge_id_to_name[_challenge_ - 1] + " Challenge Ante 8 Boss Blind", self.player))
+                        elif self.options.challenge_unlock_mode == ChallengeUnlockMode.option_as_items:
+                            add_rule(new_location, lambda state: state.has(challenge_name + " Challenge Unlock", self.player))
+                        
+                        # to make life easier for players require some jokers to be found to beat ante 4 and up! (copied over from deck locations)
+                        if ante >= 4:
+                            add_rule(new_location, lambda state, _ante3_=ante: state.has_from_list(list(jokers.values(
+                            )), self.player, 5 + _ante3_ * 2) or state.has_from_list(list(joker_bundles.values()), self.player, round((_ante3_ * 10) / self.options.joker_bundle_size.value)))
+                            add_rule(new_location, lambda state: state.has_from_list(
+                                list(['Buffoon Pack']), self.player, 1))
+
+                        # limit later stakes to "require" jokers so progression is distributed better
+
+                        if ante > 2:
+                            add_rule(new_location, lambda state:
+                                     (state.has_from_list(list(joker_bundles.values()), self.player, 1) or
+                                      state.has_from_list(list(jokers.values()), self.player, 5)) and
+                                     state.has_from_list(list(vouchers.values()), self.player, 1))
+
+                        self.locations_set += 1
+                        challenge_region.locations.append(new_location)
+                
+            
+        menu_region.connect(challenge_region, None, lambda state: can_reach_count(
+                state, get_locations_where(None, None, None)))
+        
+        
         # Joker/Voucher unlocks (these are already instantiated in Locations.py but rules are only applied here)
 
         def bundle_with_joker(joker_name: str) -> str:
@@ -590,7 +668,7 @@ class BalatroWorld(World):
                             lambda state: True)
         counter += 1
         add_unlock_location("Unlock Swashbuckler (Sell a total of 20 Jokers)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
-                            lambda state: state.has_group("Joker", self.player, 1))
+                            lambda state: state.has_group("Jokers", self.player, 1))
         counter += 1
         add_unlock_location("Unlock Troubadour (Win 5 consecutive rounds with a single hand each)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
                             lambda state: True)
@@ -727,11 +805,11 @@ class BalatroWorld(World):
         # consumable will also work for this, but too lazy to add to logic, also doesnt really matter
         counter += 1
         add_unlock_location("Unlock Burnt Joker (Sell a total of 50 cards)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
-                            lambda state: state.has_group("Joker", self.player, 1))
+                            lambda state: state.has_group("Jokers", self.player, 1))
 
         counter += 1
         add_unlock_location("Unlock Bootstraps (Have at least 2 Polychrome Jokers)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
-                            lambda state: state.has_group("Joker", self.player, 2) and state.has(bundle_with_tarot("The Wheel of Fortune"), self.player))
+                            lambda state: state.has_group("Jokers", self.player, 2) and state.has(bundle_with_tarot("The Wheel of Fortune"), self.player))
 
         counter += 1
         add_unlock_location("Unlock Canio (Find Canio using The Soul)", balatro_location_name_to_id["Joker Unlock " + str(counter)],
@@ -765,11 +843,11 @@ class BalatroWorld(World):
 
         counter += 1
         add_unlock_location("Unlock Liquidation (Redeem at least 10 voucher cards in one run)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
-                            lambda state: state.has_group("Voucher", self.player, 10))
+                            lambda state: state.has_group("Vouchers", self.player, 10))
 
         counter += 1
         add_unlock_location("Unlock Glow Up (Have at least 5 joker cards with edition effect)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
-                            lambda state: state.has_group("Joker", self.player))
+                            lambda state: state.has_group("Jokers", self.player))
 
         counter += 1
         add_unlock_location("Unlock Reroll Glut (Reroll the shop a total of 100 times)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
@@ -777,11 +855,11 @@ class BalatroWorld(World):
 
         counter += 1
         add_unlock_location("Unlock Omen Globe (Use a total of 25 Tarot cards from booster packs)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
-                            lambda state: state.has_any(list(["Arcana Pack", "Jumbo Arcana Pack", "Mega Arcana Pack"]), self.player) and state.has_group("Tarot", self.player))
+                            lambda state: state.has_any(list(["Arcana Pack", "Jumbo Arcana Pack", "Mega Arcana Pack"]), self.player) and state.has_group("Tarots", self.player))
 
         counter += 1
         add_unlock_location("Unlock Observatory (Use a total of 25 Planet cards from booster packs)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
-                            lambda state: state.has_any(list(["Celestial Pack", "Jumbo Celestial Pack", "Mega Celestial Pack"]), self.player) and state.has_group("Planet", self.player))
+                            lambda state: state.has_any(list(["Celestial Pack", "Jumbo Celestial Pack", "Mega Celestial Pack"]), self.player) and state.has_group("Planets", self.player))
 
         counter += 1
         add_unlock_location("Unlock Nacho Tong (Play a total of 2500 cards)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
@@ -793,11 +871,11 @@ class BalatroWorld(World):
 
         counter += 1
         add_unlock_location("Unlock Tarot Tycoon (Buy a total of 50 Tarot cards from the shop)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
-                            lambda state: state.has_group("Tarot", self.player))
+                            lambda state: state.has_group("Tarots", self.player))
 
         counter += 1
         add_unlock_location("Unlock Planet Tycoon (Buy a total of 50 Planet cards from the shop)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
-                            lambda state: state.has_group("Planet", self.player))
+                            lambda state: state.has_group("Planets", self.player))
 
         counter += 1
         add_unlock_location("Unlock Money Tree (Max out the interest per round earnings for ten consecutive rounds)", balatro_location_name_to_id["Voucher Unlock " + str(counter)],
@@ -836,7 +914,7 @@ class BalatroWorld(World):
 
         counter += 1
         add_unlock_location("ROI Achievement (Buy 5 vouchers by Ante 4)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
-                            lambda state: state.has_group("Voucher", self.player, 5) and can_reach_count(state, get_locations_where(None, 4, None)))
+                            lambda state: state.has_group("Vouchers", self.player, 5) and can_reach_count(state, get_locations_where(None, 4, None)))
 
         counter += 1
         add_unlock_location("Shattered Achievement (Break 2 Glass Cards in a single hand)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
@@ -850,7 +928,7 @@ class BalatroWorld(World):
 
         counter += 1
         add_unlock_location("Retrograde Achievement (Get any poker hand to level 10)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
-                            lambda state: state.has_group("Planet", self.player) or state.has(bundle_with_joker("Burnt Joker"), self.player) or state.has(bundle_with_joker("Space Joker"), self.player))
+                            lambda state: state.has_group("Planets", self.player) or state.has(bundle_with_joker("Burnt Joker"), self.player) or state.has(bundle_with_joker("Space Joker"), self.player))
 
         counter += 1
         add_unlock_location("Tiny Hands Achievement (Thin your deck down to 20 or fewer cards)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
@@ -870,14 +948,13 @@ class BalatroWorld(World):
                             lambda state: True)
 
         counter += 1
-        # TODO: add challenge implementation
         add_unlock_location("Rule Bender Achievement (Complete any challenge run)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
-                            lambda state: True)
+                            lambda state: can_reach_count(state, challenge_complete_locations, 1))
 
         counter += 1
-        # TODO: add challenge implementation
-        add_unlock_location("Rule Breaker Achievement (Complete any challenge run)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
-                            lambda state: True)
+        # only take size of challenge_complete_locations so it still works if hard challenges are excluded
+        add_unlock_location("Rule Breaker Achievement (Complete every challenge run)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
+                            lambda state: can_reach_count(state, challenge_complete_locations, len(challenge_complete_locations)))
 
         counter += 1
         add_unlock_location("Legendary Achievement (Discover a Legendary Joker)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
@@ -903,7 +980,7 @@ class BalatroWorld(World):
 
         counter += 1
         add_unlock_location("Extreme Couponer Achievement (Discover every Voucher)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
-                            lambda state: state.has_group("Voucher", self.player, len(vouchers)))
+                            lambda state: state.has_group("Vouchers", self.player, len(vouchers)))
 
         counter += 1
         add_unlock_location("Completionist Achievement (Discover your entire collection)", balatro_location_name_to_id["Achievement Unlock " + str(counter)],
@@ -914,7 +991,7 @@ class BalatroWorld(World):
                             state.has_all(list(["Spectral Pack", "Jumbo Spectral Pack", "Mega Spectral Pack"]), self.player) and
                             state.has_all(list(["Celestial Pack", "Jumbo Celestial Pack", "Mega Celestial Pack"]), self.player) and
                             state.has_all(list(["Standard Pack", "Jumbo Standard Pack", "Mega Standard Pack"]), self.player) and
-                            state.has_group("Deck", self.player, len(self.playable_decks)))
+                            state.has_group("Decks", self.player, len(self.playable_decks)))
 
         counter += 1
         if ("Gold Stake" in self.playable_stakes):

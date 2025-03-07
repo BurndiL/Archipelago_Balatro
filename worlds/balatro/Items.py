@@ -399,6 +399,28 @@ item_table: Dict[str, ItemData] = {
     "Joker Bundle 28": ItemData(offset + 548),
     "Joker Bundle 29": ItemData(offset + 549),
     "Joker Bundle 30": ItemData(offset + 550),
+    
+    "The Omelette Challenge Unlock" : ItemData(offset + 551),
+    "15 Minute City Challenge Unlock" : ItemData(offset + 552),
+    "Rich get Richer Challenge Unlock" : ItemData(offset + 553),
+    "On a Knife's Edge Challenge Unlock" : ItemData(offset + 554),
+    "X-ray Vision Challenge Unlock" : ItemData(offset + 555),
+    "Mad World Challenge Unlock" : ItemData(offset + 556),
+    "Luxury Tax Challenge Unlock" : ItemData(offset + 557),
+    "Non-Perishable Challenge Unlock" : ItemData(offset + 558),
+    "Medusa Challenge Unlock" : ItemData(offset + 559),
+    "Double or Nothing Challenge Unlock" : ItemData(offset + 560),
+    "Typecast Challenge Unlock" : ItemData(offset + 561),
+    "Inflation Challenge Unlock" : ItemData(offset + 562),
+    "Bram Poker Challenge Unlock" : ItemData(offset + 563),
+    "Fragile Challenge Unlock" : ItemData(offset + 564),
+    "Monolith Challenge Unlock" : ItemData(offset + 565),
+    "Blast Off Challenge Unlock" : ItemData(offset + 566),
+    "Five-Card Draw Challenge Unlock" : ItemData(offset + 567),
+    "Golden Needle Challenge Unlock" : ItemData(offset + 568),
+    "Cruelty Challenge Unlock" : ItemData(offset + 569),
+    "Jokerless Challenge Unlock" : ItemData(offset + 570),
+    
 }
 
 stake_to_number: Dict[str, int] = {
@@ -503,6 +525,9 @@ def is_spectral_bundle(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
     return (item_id >= 384 and item_id <= 388) or item_id == 373
 
+def is_challenge_unlock(item_name: str) -> bool:
+    item_id = item_name_to_id[item_name] - offset
+    return (item_id >= 551 and item_id <= 570)
 
 def is_progression(item_name: str) -> bool:
     return (is_deck(item_name) or
@@ -514,7 +539,8 @@ def is_progression(item_name: str) -> bool:
             is_stake(item_name) or
             is_stake_per_deck(item_name) or
             is_booster(item_name) or
-            is_bundle(item_name)
+            is_bundle(item_name) or
+            is_challenge_unlock(item_name)
             )
 
 
@@ -524,19 +550,19 @@ def is_useful(item_name: str) -> bool:
 
 def get_category(item_name: str) -> str:
     if is_planet(item_name) or is_planet_bundle(item_name):
-        return "Planet"
+        return "Planets"
     if is_tarot(item_name) or is_tarot_bundle(item_name):
-        return "Tarot"
+        return "Tarots"
     if is_spectral(item_name) or is_spectral_bundle(item_name):
-        return "Spectral"
+        return "Spectrals"
     if is_joker(item_name) or is_joker_bundle(item_name):
-        return "Joker"
+        return "Jokers"
     if is_voucher(item_name):
-        return "Voucher"
+        return "Vouchers"
     if is_deck(item_name):
-        return "Deck"
+        return "Decks"
     if is_stake_per_deck(item_name) or is_stake(item_name):
-        return "Stake"
+        return "Stakes"
     
     return "Other"
 

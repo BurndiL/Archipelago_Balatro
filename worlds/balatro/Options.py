@@ -322,7 +322,59 @@ class Traps(Choice):
     option_high_amount = 3
     option_mayhem = 4
     default = option_medium_amount
+    
+    
+class IncludeJokerUnlocks(Toggle):
+    """Include the Joker Unlocks from the vanilla game as locations."""
+    display_name = "Include Joker Unlocks"
+    
+class IncludeVoucherUnlocks(Toggle):
+    """Include the Voucher Unlocks from the vanilla game as locations."""
+    display_name = "Include Voucher Unlocks"
+    
+class IncludeAchievements(Choice):
+    """Include the Achievements from the vanilla game as locations.
+        None: Don't include achievement locations.
+        Easy: Include only some achievements that aren't that much of a headache.
+        All: Include all achievements, even Completionist++ and similar.
+        
+        Side-Note: Completionist+ and Completionist++ will only be included if Gold Stake is a playable stake."""
+    display_name = "Include Achievements"
+    option_include_none = 0
+    option_include_easy = 1
+    option_include_all = 2
+    default = option_include_easy
+    
 
+class IncludeChallenges(Choice):
+    """Include Challenges as Locations.
+        None: Don't include challenges as locations.
+        Easy: Only include easy challenges as locations.
+        All: Include all challenges as locations.
+        """
+    display_name = "Include Challenges"
+    option_include_none = 0
+    option_include_easy = 1
+    option_include_all = 2
+    default = option_include_easy
+    
+class ChallengeUnlockMode(Choice):
+    """If Challenges are included, decide how to unlock them.
+        Vanilla: beat challenges to unlock more challenges, just how it is handled in the base game.
+        Unlocks as Items: find the challenges as items in the world and if collected, the corresponding challenge can be played.
+        All Unlocked: All Challenges are unlocked from the start"""
+    display_name = "Challenge Unlock Mode"
+    option_vanilla = 0
+    option_as_items = 1 
+    option_all_unlocked = 2
+    default = option_as_items
+    
+    
+class OnlyBossBlindsAreChecks(Toggle):
+    """Decide whether you want only Boss Blinds as locations or if you also want to include beating the small and big blinds as additional locations.
+    Skipped Small and Big Blinds will be checked after beating the Boss Blind of the Ante.
+    Setting this to true will only have Boss Blinds, setting it to false will also include Small and Big Blinds."""
+    display_name = "Only Boss Blinds as checks"
 
 @dataclass
 class BalatroOptions(PerGameCommonOptions):
@@ -345,6 +397,18 @@ class BalatroOptions(PerGameCommonOptions):
     include_stakesMode: IncludeStakesMode
     include_stakesList: IncludeStakeList
     include_stakesNumber: IncludeStakesNumber
+    
+    # Blinds
+    only_boss_blinds_are_checks : OnlyBossBlindsAreChecks
+    
+    # Unlocks
+    include_joker_unlocks : IncludeJokerUnlocks
+    include_voucher_unlocks : IncludeVoucherUnlocks
+    include_achievements : IncludeAchievements
+    
+    # Challenges
+    include_challenges :IncludeChallenges
+    challenge_unlock_mode : ChallengeUnlockMode
 
     # jokers 
     joker_bundles: JokerBundles

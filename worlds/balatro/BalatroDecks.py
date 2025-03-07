@@ -35,3 +35,27 @@ deck_name_to_key = {
     "Plasma Deck": "b_plasma",
     "Erratic Deck": "b_erratic"
 }
+
+
+challenge_id_to_name = {
+    1: "The Omelette",
+    2: "15 Minute City",
+    3: "Rich get Richer",
+    4: "On a Knife's Edge",
+    5: "X-ray Vision",
+    6: "Mad World",
+    7: "Luxury Tax",
+    8: "Non-Perishable",
+    9: "Medusa",
+    10: "Double or Nothing",
+    11: "Typecast",
+    12: "Inflation",
+    13: "Bram Poker",
+    14: "Fragile",
+    15: "Monolith",
+    16: "Blast Off",
+    17: "Five-Card Draw",
+    18: "Golden Needle",
+    19: "Cruelty",
+    20: "Jokerless"    
+}
