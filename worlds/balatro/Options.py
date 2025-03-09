@@ -5,7 +5,7 @@ from BaseClasses import Item
 from .Items import item_table, is_joker, stake_to_number, number_to_stake
 from .Locations import max_shop_items, max_consumable_items
 from Options import DefaultOnToggle, OptionSet, PerGameCommonOptions, Toggle, Range, Choice, Option, FreeText, Visibility
-from .BalatroDecks import deck_id_to_name
+from .BalatroDecks import deck_id_to_name, challenge_id_to_name
 
 
 class Goal(Choice):
@@ -15,7 +15,8 @@ class Goal(Choice):
         Beat Ante: Beat the specified Ante (can be higher than 8)
         Beat Decks on Stake: Win with the specified amount of Decks on the specified Stake (or harder)
         Win with Jokers on Stake: Win with the specified amount of Jokers on the specified Stake (or harder)
-        Unique Wins: Win with the specified amount of unique combinations of Decks and Stakes                  
+        Unique Wins: Win with the specified amount of unique combinations of Decks and Stakes     
+        Clear Challenges: Complete a set amount of challenges              
     """
     display_name = "Goal"
     option_beat_decks = 0
@@ -24,6 +25,7 @@ class Goal(Choice):
     option_beat_decks_on_stake = 3
     option_win_with_jokers_on_stake = 4
     option_beat_unique_decks = 5
+    option_clear_challenges = 6
     default = option_beat_decks
 
 
@@ -72,18 +74,30 @@ class RequiredStakeForGoal(OptionSet):
     valid_keys = [key for key, _ in stake_to_number.items()]
 
 
+class ChallengesForGoal(Range):
+    """The amount of challenges you need to complete to reach the goal.
+    Make sure you don't exclude too many challenges to make this impossible.
+    If your goal isn't 'clear challenges', this setting can be ignored."""
+    display_name = "Amount of challenges for goal"
+    default = 10
+    range_start = 1
+    range_end = 20
+
+
 class JokerBundles(Toggle):
     """Rather than handling each joker as an individual item, you can group them into bundles for quicker progress 
     and fewer items to manage in the world. When enabled, all 150 jokers will be placed into randomly generated bundles. 
     You can also specify the size of these joker bundles"""
     display_name = "Joker Bundles"
-    
+
+
 class JokerBundleSize(Range):
     """Specify the size of Joker Bundles."""
     display_name = "Joker Bundle Size"
     range_start = 5
     range_end = 30
     default = 10
+
 
 class TarotBundle(Choice):
     """Instead of making every tarot card an individual item, you have the option to put them all in one bundle, 
@@ -94,6 +108,7 @@ class TarotBundle(Choice):
     option_one_bundle = 1
     option_custom_bundles = 2
 
+
 class CustomTarotBundles(OptionSet):
     """Only fuck with this if you really want to. You can define up to 5 custom bundles. You have to 
     include every tarot, otherwise it won't work (there is no proper check for this so PLEASE double or triple check yourself). 
@@ -102,8 +117,10 @@ class CustomTarotBundles(OptionSet):
     The Syntax of this is the following: ['The Fool;The Magician;The High Priestess;The Empress;The Emperor', ...] where the bundles are separated by the commas.
     Make sure to use the right symbols."""
     display_name = "Custom Tarot Bundles"
-    default = ["The Fool;The Magician;The High Priestess;The Empress;The Emperor","The Hierophant;The Lovers","The Chariot;Justice;The Hermit;The Wheel of Fortune;Strength;Death","The Hanged Man;Temperance;The Devil;The Tower;The Star","The Moon;The Sun;Judgement;The World"]
-    
+    default = ["The Fool;The Magician;The High Priestess;The Empress;The Emperor", "The Hierophant;The Lovers",
+               "The Chariot;Justice;The Hermit;The Wheel of Fortune;Strength;Death", "The Hanged Man;Temperance;The Devil;The Tower;The Star", "The Moon;The Sun;Judgement;The World"]
+
+
 class PlanetBundle(Choice):
     """Instead of making every planet card an individual item, you have the option to put them all in one bundle, 
     that gets placed in the world.
@@ -112,7 +129,8 @@ class PlanetBundle(Choice):
     option_individual = 0
     option_one_bundle = 1
     option_custom_bundles = 2
-    
+
+
 class CustomPlanetBundles(OptionSet):
     """Only fuck with this if you really want to. You can define up to 5 custom bundles. You have to 
     include every planet, otherwise it won't work. If you have Number of AP consumable items set to greater than 1 you also
@@ -120,6 +138,7 @@ class CustomPlanetBundles(OptionSet):
     For the Syntax refer to Custom Tarot Bundles, it's the same here."""
     display_name = "Custom Planet Bundles"
     default = []
+
 
 class SpectralBundle(Choice):
     """Instead of making every spectral card an individual item, you have the option to put them all in one bundle, 
@@ -130,6 +149,7 @@ class SpectralBundle(Choice):
     option_one_bundle = 1
     option_custom_bundles = 2
 
+
 class CustomSpectralBundles(OptionSet):
     """Only fuck with this if you really want to. You can define up to 5 custom bundles. You have to 
     include every spectral, otherwise it won't work. If you have Number of AP consumable items set to greater than 1 you also
@@ -137,6 +157,7 @@ class CustomSpectralBundles(OptionSet):
     For the Syntax refer to Custom Tarot Bundles, it's the same here."""
     display_name = "Custom Spectral Bundles"
     default = []
+
 
 class RemoveOrDebuffJokers(Toggle):
     """Choose whether locked jokers should be completely removed or appear in a debuffed state. 
@@ -271,13 +292,15 @@ class MaximumShopPrice(Range):
     range_end = 100
     default = 10
 
+
 class ArchipelagoConsumableItems(Range):
     """Number of items that can be received by redeeming 
     an AP planet, tarot or spectral card"""
     display_name = "Number of AP consumable items"
     range_start = 0
-    range_end = max_consumable_items # 300
+    range_end = max_consumable_items  # 300
     default = 100
+
 
 class DecksUnlockedFromStart(Range):
     """Number of random decks you want to start with."""
@@ -290,8 +313,8 @@ class DecksUnlockedFromStart(Range):
 class DeathLink(Toggle):
     """When your run ends, everybody will die. When somebody else dies, your run will end."""
     display_name = "Death Link"
-    
-    
+
+
 class ForceYaml(Toggle):
     """Some settings (like death link or remove_or_debuff_jokers etc) can be changed in-game after the fact. 
     If you want to disallow this (for a race for example) set this option to true."""
@@ -322,42 +345,93 @@ class Traps(Choice):
     option_high_amount = 3
     option_mayhem = 4
     default = option_medium_amount
-    
-    
-class IncludeJokerUnlocks(Toggle):
-    """Include the Joker Unlocks from the vanilla game as locations."""
+
+
+class IncludeJokerUnlocks(Choice):
+    """Include the Joker Unlocks from the vanilla game as locations.
+        None: Don't include Joker Unlocks as locations.
+        Easy: Include only some easier/shorter Joker Unlocks.
+        Medium: Medium difficulty Joker Unlocks.
+        Hard: Harder Joker Unlocks.
+        All: Include all Joker Unlocks."""
     display_name = "Include Joker Unlocks"
-    
-class IncludeVoucherUnlocks(Toggle):
-    """Include the Voucher Unlocks from the vanilla game as locations."""
+    option_include_none = 0
+    option_include_easy = 1
+    option_include_medium = 2
+    option_include_hard = 3
+    option_include_all = 4
+    default = option_include_medium
+
+
+class IncludeVoucherUnlocks(Choice):
+    """Include the Voucher Unlocks from the vanilla game as locations.
+        None: Don't include Voucher Unlocks as locations.
+        Easy: Include only some easier/shorter Voucher Unlocks that aren't that much of a headache.
+        Medium: Medium difficulty Voucher Unlocks.
+        Hard: Harder Voucher Unlocks.
+        All: Include all Voucher Unlocks."""
     display_name = "Include Voucher Unlocks"
-    
+    option_include_none = 0
+    option_include_easy = 1
+    option_include_medium = 2
+    option_include_hard = 3
+    option_include_all = 4
+    default = option_include_medium
+
+
 class IncludeAchievements(Choice):
     """Include the Achievements from the vanilla game as locations.
         None: Don't include achievement locations.
         Easy: Include only some achievements that aren't that much of a headache.
         All: Include all achievements, even Completionist++ and similar.
-        
+
         Side-Note: Completionist+ and Completionist++ will only be included if Gold Stake is a playable stake."""
     display_name = "Include Achievements"
     option_include_none = 0
     option_include_easy = 1
-    option_include_all = 2
-    default = option_include_easy
-    
+    option_include_medium = 2
+    option_include_hard = 3
+    option_include_all = 4
+    default = option_include_medium
 
-class IncludeChallenges(Choice):
+
+class IncludeChallenges(Toggle):
     """Include Challenges as Locations.
-        None: Don't include challenges as locations.
-        Easy: Only include easy challenges as locations.
-        All: Include all challenges as locations.
+        You can exclude challenges you don't want to play in the ExcludeChallenges setting.
+        False: Don't include challenges as locations.
+        True: Include challenges as locations.
         """
     display_name = "Include Challenges"
-    option_include_none = 0
-    option_include_easy = 1
-    option_include_all = 2
-    default = option_include_easy
-    
+
+
+class ExcludeChallenges(OptionSet):
+    """If you included challenges to be locations, you can exclude the ones you do not want to play (like Jokerless or Golden Needle, you know).
+    These are the Challenge names: 
+    "The Omelette",
+    "15 Minute City",
+    "Rich get Richer",
+    "On a Knife's Edge",
+    "X-ray Vision",
+    "Mad World",
+    "Luxury Tax",
+    "Non-Perishable",
+    "Medusa",
+    "Double or Nothing",
+    "Typecast",
+    "Inflation",
+    "Bram Poker",
+    "Fragile",
+    "Monolith",
+    "Blast Off",
+    "Five-Card Draw",
+    "Golden Needle",
+    "Cruelty",
+    "Jokerless"    """
+    display_name = "Exclude Challenges"
+    valid_keys = [value for key, value in challenge_id_to_name.items()]
+    default = ['Golden Needle', 'Cruelty', 'Jokerless']
+
+
 class ChallengeUnlockMode(Choice):
     """If Challenges are included, decide how to unlock them.
         Vanilla: beat challenges to unlock more challenges, just how it is handled in the base game.
@@ -365,16 +439,53 @@ class ChallengeUnlockMode(Choice):
         All Unlocked: All Challenges are unlocked from the start"""
     display_name = "Challenge Unlock Mode"
     option_vanilla = 0
-    option_as_items = 1 
+    option_as_items = 1
     option_all_unlocked = 2
     default = option_as_items
-    
-    
+
+
 class OnlyBossBlindsAreChecks(Toggle):
     """Decide whether you want only Boss Blinds as locations or if you also want to include beating the small and big blinds as additional locations.
     Skipped Small and Big Blinds will be checked after beating the Boss Blind of the Ante.
     Setting this to true will only have Boss Blinds, setting it to false will also include Small and Big Blinds."""
     display_name = "Only Boss Blinds as checks"
+
+
+class DiscoverJokerAsLocations(Choice):
+    """Make discovering (=acquiring) Jokers Locations.
+        Off: Don't add these locations.
+        Non-Legendary: Add all non-legendary discoveries as Locations.
+        All: Add all Joker discoveries as locations."""
+    display_name = "Discover Jokers as Locations"
+    option_off = 0
+    option_non_legendary = 1
+    option_all = 2
+    default = option_non_legendary
+
+
+class ModdedItems(Choice):
+    """Decide what to do with items from other mods.
+        Remove: Remove items from other mods during Archipelago runs.
+        Unlock: Have items from other mods always unlocked.
+        Include as AP Items: Have a set amount of "import licenses", the more you collect the higher
+            the chance that a modded item is unlocked. These are not considered in logic but the 
+            easiest way to still include items from other mods in your world."""
+    display_name = "Modded Items"
+    option_remove = 0
+    option_unlock = 1
+    option_include_as_ap_items = 2
+    default = option_remove
+
+
+class NumberOfImportLicenses(Range):
+    """This setting will be ignored if you did not set Modded Items to "Inlude as AP Items".
+        Set the amount of Import Licenses in your world.
+        The more you collect, the more modded items will be unlocked."""
+    display_name = "Number of Import Licenses"
+    range_start = 1
+    range_end = 50
+    default = 15
+
 
 @dataclass
 class BalatroOptions(PerGameCommonOptions):
@@ -386,7 +497,8 @@ class BalatroOptions(PerGameCommonOptions):
     unique_deck_win_goal: UniqueDeckWins
     jokers_unlock_goal: JokerGoal
     required_stake_for_goal: RequiredStakeForGoal
-    
+    number_of_challenges_for_goal: ChallengesForGoal
+
     # decks
     include_decksMode: IncludeDecksMode
     include_deckChoice: IncludeDecksList
@@ -397,31 +509,35 @@ class BalatroOptions(PerGameCommonOptions):
     include_stakesMode: IncludeStakesMode
     include_stakesList: IncludeStakeList
     include_stakesNumber: IncludeStakesNumber
-    
-    # Blinds
-    only_boss_blinds_are_checks : OnlyBossBlindsAreChecks
-    
-    # Unlocks
-    include_joker_unlocks : IncludeJokerUnlocks
-    include_voucher_unlocks : IncludeVoucherUnlocks
-    include_achievements : IncludeAchievements
-    
-    # Challenges
-    include_challenges :IncludeChallenges
-    challenge_unlock_mode : ChallengeUnlockMode
 
-    # jokers 
+    # Blinds
+    only_boss_blinds_are_checks: OnlyBossBlindsAreChecks
+
+    # Unlocks
+    include_joker_unlocks: IncludeJokerUnlocks
+    include_voucher_unlocks: IncludeVoucherUnlocks
+    include_achievements: IncludeAchievements
+
+    # Discover Locations
+    discover_jokers_as_locations: DiscoverJokerAsLocations
+
+    # Challenges
+    include_challenges: IncludeChallenges
+    exclude_challenges: ExcludeChallenges
+    challenge_unlock_mode: ChallengeUnlockMode
+
+    # jokers
     joker_bundles: JokerBundles
-    joker_bundle_size : JokerBundleSize
+    joker_bundle_size: JokerBundleSize
     remove_or_debuff_jokers: RemoveOrDebuffJokers
-    
-    # consumables    
+
+    # consumables
     tarot_bundle: TarotBundle
-    custom_tarot_bundles : CustomTarotBundles
+    custom_tarot_bundles: CustomTarotBundles
     planet_bundle: PlanetBundle
-    custom_planet_bundles : CustomPlanetBundles
+    custom_planet_bundles: CustomPlanetBundles
     spectral_bundle: SpectralBundle
-    custom_spectral_bundles : CustomSpectralBundles
+    custom_spectral_bundles: CustomSpectralBundles
     remove_or_debuff_consumables: RemoveOrDebuffConsumables
 
     # items
@@ -432,12 +548,14 @@ class BalatroOptions(PerGameCommonOptions):
     shop_items: ShopItems
     minimum_price: MinimumShopPrice
     maximum_price: MaximumShopPrice
-    
+
     # traps
     trap_amount: Traps
 
     # deathlink
     deathlink: DeathLink
-    
-    #misc
+
+    # misc
+    modded_items: ModdedItems
+    import_licenses: NumberOfImportLicenses
     forceyaml: ForceYaml

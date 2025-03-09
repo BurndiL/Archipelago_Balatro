@@ -1,5 +1,5 @@
 from .BalatroDecks import deck_id_to_name, challenge_id_to_name
-from .Items import number_to_stake
+from .Items import number_to_stake, jokers
 from worlds.generic.Rules import add_rule
 from BaseClasses import Location
 
@@ -36,9 +36,10 @@ for deck in deck_id_to_name:
                     blind_name = "Small Blind"
                 elif blind == 1:
                     blind_name = "Big Blind"
-                    
+
                 location_name = deck_id_to_name[deck] + " Ante " + \
-                    str(ante+1) + " " + number_to_stake[stake+1] + " " + blind_name
+                    str(ante+1) + " " + \
+                    number_to_stake[stake+1] + " " + blind_name
                 location_id = prev_id
                 prev_id += 1
                 balatro_location_name_to_id[location_name] = location_id
@@ -52,16 +53,17 @@ for deck in deck_id_to_name:
 for challenge in challenge_id_to_name:
     for ante in range(8):
         for blind in range(3):
-            
+
             blind_name = "Boss Blind"
             if blind == 0:
                 blind_name = "Small Blind"
             elif blind == 1:
                 blind_name = "Big Blind"
-            
-            location_name = challenge_id_to_name[challenge] + " Challenge Ante " + str(ante+1) + " " + blind_name
+
+            location_name = challenge_id_to_name[challenge] + \
+                " Challenge Ante " + str(ante+1) + " " + blind_name
             location_id = prev_id
-            prev_id += 1 
+            prev_id += 1
             balatro_location_name_to_id[location_name] = location_id
             balatro_location_id_to_name[location_id] = location_name
             balatro_location_id_to_ante[location_id] = ante + 1
@@ -84,44 +86,53 @@ for j in range(8):
 
 
 # Consumable Locations. Generate maximum amount here as well, but not all will be included in the multiworld
-consumable_id_offset = prev_id + 1 
+consumable_id_offset = prev_id + 1
 
 for j in range(max_consumable_items):
     prev_id += 1
-    location_name = "Consumable Item " + str(j+1) # This name to be changed (dont forget to change in init.py)
+    # This name to be changed (dont forget to change in init.py)
+    location_name = "Consumable Item " + str(j+1)
     location_id = prev_id
 
     balatro_location_name_to_id[location_name] = location_id
     balatro_location_id_to_name[location_id] = location_name
-    
-    
-# Joker/Voucher unlock locations 
+
+
+# Joker/Voucher unlock locations
 
 # 45 Joker Unlock Locations
 for j in range(45):
     prev_id += 1
-    location_name = "Joker Unlock " + str(j+1) 
+    location_name = "Joker Unlock " + str(j+1)
     location_id = prev_id
 
     balatro_location_name_to_id[location_name] = location_id
     balatro_location_id_to_name[location_id] = location_name
-    
+
 # 16 Voucher Unlock Locations
 for j in range(16):
     prev_id += 1
-    location_name = "Voucher Unlock " + str(j+1) 
+    location_name = "Voucher Unlock " + str(j+1)
     location_id = prev_id
 
     balatro_location_name_to_id[location_name] = location_id
     balatro_location_id_to_name[location_id] = location_name
-    
-    
+
+
 for j in range(31):
     prev_id += 1
-    location_name = "Achievement Unlock " + str(j+1) 
+    location_name = "Achievement Unlock " + str(j+1)
     location_id = prev_id
 
     balatro_location_name_to_id[location_name] = location_id
     balatro_location_id_to_name[location_id] = location_name
-    
-    
+
+
+# 150 Joker Discovery Locations
+for i, j in jokers.items():
+    prev_id += 1
+    location_name = "Discover " + j
+    location_id = prev_id
+
+    balatro_location_name_to_id[location_name] = location_id
+    balatro_location_id_to_name[location_id] = location_name
