@@ -179,7 +179,7 @@ item_table: Dict[str, ItemData] = {
     "Astronomer": ItemData(offset + 158),
     "Burnt Joker": ItemData(offset + 159),
     "Bootstraps": ItemData(offset + 160),
-    "Caino": ItemData(offset + 161),
+    "Canio": ItemData(offset + 161),
     "Triboulet": ItemData(offset + 162),
     "Yorick": ItemData(offset + 163),
     "Chicot": ItemData(offset + 164),

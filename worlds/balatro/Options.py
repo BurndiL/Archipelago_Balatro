@@ -186,7 +186,7 @@ class FillerJokers(OptionSet):
     display_name = "Set jokers as filler"
     default = []
     valid_keys = [key for key, _ in item_table.items(
-    ) if is_joker(key)] + ["Canio", "Riff-Raff"]
+    ) if is_joker(key)] + ["Riff-Raff"]
 
 
 class IncludeDecksMode(Choice):

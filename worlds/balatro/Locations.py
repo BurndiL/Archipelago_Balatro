@@ -1,6 +1,6 @@
-from .BalatroDecks import deck_id_to_name, challenge_id_to_name
+from .BalatroDecks import deck_id_to_name, challenge_id_to_name, VoucherUnlocks, JokerUnlocks, AchievementUnlocks
 from .Items import number_to_stake, jokers
-from worlds.generic.Rules import add_rule
+from worlds.generic.Rules import add_rule, CollectionRule
 from BaseClasses import Location
 
 max_shop_items = 150
@@ -38,8 +38,8 @@ for deck in deck_id_to_name:
                     blind_name = "Big Blind"
 
                 location_name = deck_id_to_name[deck] + " Ante " + \
-                    str(ante+1) + " " + \
-                    number_to_stake[stake+1] + " " + blind_name
+                                str(ante + 1) + " " + \
+                                number_to_stake[stake + 1] + " " + blind_name
                 location_id = prev_id
                 prev_id += 1
                 balatro_location_name_to_id[location_name] = location_id
@@ -61,7 +61,7 @@ for challenge in challenge_id_to_name:
                 blind_name = "Big Blind"
 
             location_name = challenge_id_to_name[challenge] + \
-                " Challenge Ante " + str(ante+1) + " " + blind_name
+                            " Challenge Ante " + str(ante + 1) + " " + blind_name
             location_id = prev_id
             prev_id += 1
             balatro_location_name_to_id[location_name] = location_id
@@ -75,15 +75,13 @@ shop_id_offset = prev_id + 1
 
 for j in range(8):
     for i in range(max_shop_items):
-
         prev_id += 1
 
-        location_name = "Shop Item " + str(i+1) + " at " + number_to_stake[j+1]
+        location_name = "Shop Item " + str(i + 1) + " at " + number_to_stake[j + 1]
         location_id = prev_id
 
         balatro_location_name_to_id[location_name] = location_id
         balatro_location_id_to_name[location_id] = location_name
-
 
 # Consumable Locations. Generate maximum amount here as well, but not all will be included in the multiworld
 consumable_id_offset = prev_id + 1
@@ -91,42 +89,43 @@ consumable_id_offset = prev_id + 1
 for j in range(max_consumable_items):
     prev_id += 1
     # This name to be changed (dont forget to change in init.py)
-    location_name = "Consumable Item " + str(j+1)
+    location_name = "Consumable Item " + str(j + 1)
     location_id = prev_id
 
     balatro_location_name_to_id[location_name] = location_id
     balatro_location_id_to_name[location_id] = location_name
-
 
 # Joker/Voucher unlock locations
 
 # 45 Joker Unlock Locations
-for j in range(45):
-    prev_id += 1
-    location_name = "Joker Unlock " + str(j+1)
-    location_id = prev_id
+for key, value in vars(JokerUnlocks).items():
+    if not key.startswith("__"):  # Exclude special attributes
+        prev_id += 1
+        location_name = value
+        location_id = prev_id
 
-    balatro_location_name_to_id[location_name] = location_id
-    balatro_location_id_to_name[location_id] = location_name
+        balatro_location_name_to_id[location_name] = location_id
+        balatro_location_id_to_name[location_id] = location_name
 
 # 16 Voucher Unlock Locations
-for j in range(16):
-    prev_id += 1
-    location_name = "Voucher Unlock " + str(j+1)
-    location_id = prev_id
+for key, value in vars(VoucherUnlocks).items():
+    if not key.startswith("__"):  # Exclude special attributes
+        prev_id += 1
+        location_name = value
+        location_id = prev_id
 
-    balatro_location_name_to_id[location_name] = location_id
-    balatro_location_id_to_name[location_id] = location_name
+        balatro_location_name_to_id[location_name] = location_id
+        balatro_location_id_to_name[location_id] = location_name
 
+# 31 Achievement Unlock Locations
+for key, value in vars(AchievementUnlocks).items():
+    if not key.startswith("__"):  # Exclude special attributes
+        prev_id += 1
+        location_name = value
+        location_id = prev_id
 
-for j in range(31):
-    prev_id += 1
-    location_name = "Achievement Unlock " + str(j+1)
-    location_id = prev_id
-
-    balatro_location_name_to_id[location_name] = location_id
-    balatro_location_id_to_name[location_id] = location_name
-
+        balatro_location_name_to_id[location_name] = location_id
+        balatro_location_id_to_name[location_id] = location_name
 
 # 150 Joker Discovery Locations
 for i, j in jokers.items():
