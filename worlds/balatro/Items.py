@@ -1,4 +1,3 @@
-
 from BaseClasses import Item
 
 from typing import Dict, NamedTuple
@@ -421,7 +420,9 @@ item_table: Dict[str, ItemData] = {
     "Cruelty Challenge Unlock": ItemData(offset + 569),
     "Jokerless Challenge Unlock": ItemData(offset + 570),
 
-    "Import License": ItemData(offset + 571),
+    "Challenge Deck": ItemData(offset + 571),
+
+    "Import License": ItemData(offset + 572),
 
 }
 
@@ -500,7 +501,8 @@ def is_joker_bundle(item_name: str) -> bool:
 
 def is_bundle(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
-    return is_spectral_bundle(item_name) or is_joker_bundle(item_name) or is_tarot_bundle(item_name) or is_planet_bundle(item_name)
+    return is_spectral_bundle(item_name) or is_joker_bundle(item_name) or is_tarot_bundle(
+        item_name) or is_planet_bundle(item_name)
 
 
 def is_stake(item_name: str) -> bool:
@@ -533,9 +535,14 @@ def is_challenge_unlock(item_name: str) -> bool:
     return (item_id >= 551 and item_id <= 570)
 
 
+def is_challenge_deck(item_name: str) -> bool:
+    item_id = item_name_to_id[item_name] - offset
+    return item_id == 571
+
+
 def is_import_license(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
-    return (item_id == 571)
+    return item_id == 572
 
 
 def is_progression(item_name: str) -> bool:
@@ -583,7 +590,6 @@ item_id_to_name: Dict[int, str] = {
 item_name_to_id: Dict[str, int] = {
     item_name: data.code for item_name, data in item_table.items() if data.code
 }
-
 
 jokers: Dict[int, str] = {
     data.code: item_name for item_name, data in item_table.items() if data.code and is_joker(item_name)
