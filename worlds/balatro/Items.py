@@ -450,7 +450,7 @@ number_to_stake: Dict[int, str] = {
 
 
 def is_deck(item_name: str) -> bool:
-    return item_name.endswith("Deck")
+    return item_name.endswith("Deck") and not item_name.startswith("Challenge")     # help me
 
 
 decks: Dict[int, str] = {
@@ -496,7 +496,7 @@ def is_spectral(item_name: str) -> bool:
 
 def is_joker_bundle(item_name: str) -> bool:
     item_id = item_name_to_id[item_name] - offset
-    return (item_id >= 521 and item_id <= 540)
+    return (item_id >= 521 and item_id <= 550)
 
 
 def is_bundle(item_name: str) -> bool:
@@ -556,7 +556,8 @@ def is_progression(item_name: str) -> bool:
             is_stake_per_deck(item_name) or
             is_booster(item_name) or
             is_bundle(item_name) or
-            is_challenge_unlock(item_name)
+            is_challenge_unlock(item_name) or
+            is_challenge_deck(item_name)
             )
 
 

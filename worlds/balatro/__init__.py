@@ -89,7 +89,6 @@ class BalatroWorld(World):
     distributed_fillers = dict()
 
     def generate_early(self):
-
         global value
         self.random.shuffle(self.short_mode_pool)
 
@@ -104,6 +103,9 @@ class BalatroWorld(World):
             self.playable_decks = playable_deck_choice[0:
                                                        self.options.include_deck_number.value]
         elif self.options.include_decks_mode.value == IncludeDecksMode.option_choose:
+            # (there might be possibility of somebody doing challenge only runs)
+            if (len(self.options.include_deck_choice.value)) < 1 and not self.options.include_challenges:
+                raise OptionError("Must have at least one playable deck chosen.")
             self.playable_decks = self.options.include_deck_choice.value
 
         # stakes
@@ -144,6 +146,10 @@ class BalatroWorld(World):
 
         # Challenges
 
+        # makes no sense to not do this for randomly generated yamls or people accidentally setting it to false
+        if self.options.goal == Goal.option_clear_challenges:
+            self.options.include_challenges.value = IncludeChallenges.option_true
+
         # get all included challenges into a list
         for challenge in self.options.exclude_challenges.value:
             if challenge in self.playable_challenges:
@@ -153,7 +159,7 @@ class BalatroWorld(World):
             # if there are too many excluded challenges to complete the goal, make the goal easier
 
             nr_playable_challenges = len(challenge_id_to_name.keys()) - len(self.options.exclude_challenges.value)
-            if nr_playable_challenges > self.options.number_of_challenges_for_goal.value:
+            if nr_playable_challenges < self.options.number_of_challenges_for_goal.value:
                 self.options.number_of_challenges_for_goal.value = nr_playable_challenges
 
         # Joker Bundles
@@ -567,7 +573,8 @@ class BalatroWorld(World):
 
                         if ante > 2:
                             add_rule(new_location, lambda state, _stake2_=stake:
-                            (state.has_from_list(list(joker_bundles.values()), self.player, (_stake2_ - 2))
+                            (state.has_from_list(list(joker_bundles.values()), self.player,
+                                                 round((_stake2_ * 10) / self.options.joker_bundle_size.value))
                              or state.has_from_list(list(jokers.values()), self.player,
                                                     min((_stake2_ - 2) * 6, prog_jokers)))
                             and state.has_from_list(list(vouchers.values()), self.player, _stake2_ - 2))
@@ -736,8 +743,9 @@ class BalatroWorld(World):
                         # limit later stakes to "require" jokers so progression is distributed better
 
                         if ante > 2:
-                            add_rule(new_location, lambda state:
-                            (state.has_from_list(list(joker_bundles.values()), self.player, 1) or
+                            add_rule(new_location, lambda state, _ante_=ante:
+                            (state.has_from_list(list(joker_bundles.values()), self.player, round(
+                                (_ante_ * 10) / self.options.joker_bundle_size.value)) or
                              state.has_from_list(list(jokers.values()), self.player, min(5, prog_jokers))) and
                             state.has_from_list(list(vouchers.values()), self.player, 1))
 
@@ -1350,7 +1358,7 @@ class BalatroWorld(World):
 
             self.multiworld.completion_condition[self.player] = lambda state: state.has_from_list(list(jokers.values()),
                                                                                                   self.player,
-                                                                                                  self.options.jokers_unlock_goal.value) or \
+                                                                                                  min(self.options.jokers_unlock_goal.value, prog_jokers)) or \
                                                                               state.has_from_list(
                                                                                   list(joker_bundles.values()),
                                                                                   self.player, math.ceil(
@@ -1366,9 +1374,10 @@ class BalatroWorld(World):
                 self.options.decks_win_goal.value)
 
         elif self.options.goal.value == Goal.option_win_with_jokers_on_stake:
+
             self.multiworld.completion_condition[self.player] = lambda state: \
                 can_reach_count(state, get_locations_where(None, 8, stake_to_number[self.required_stake]), 1) and \
-                (state.has_from_list(list(jokers.values()), self.player, self.options.jokers_unlock_goal.value) or
+                (state.has_from_list(list(jokers.values()), self.player, min(self.options.jokers_unlock_goal.value, prog_jokers)) or
                  state.has_from_list(list(joker_bundles.values()), self.player, math.ceil(
                      self.options.jokers_unlock_goal.value / self.options.joker_bundle_size.value)))
 
