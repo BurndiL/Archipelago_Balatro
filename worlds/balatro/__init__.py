@@ -757,8 +757,7 @@ class BalatroWorld(World):
                         self.locations_set += 1
                         challenge_region.locations.append(new_location)
 
-        menu_region.connect(challenge_region, None, lambda state: can_reach_count(
-            state, get_locations_where(None, None, None)))
+        menu_region.connect(challenge_region)
 
         # Joker Discovery Locations
         legendary_jokers = ["Canio", "Chicot", "Perkeo", "Yorick", "Triboulet"]
@@ -1251,8 +1250,8 @@ class BalatroWorld(World):
                                 lambda state: can_reach_count(state, get_locations_where(None, 8, 8)) and
                                               (state.has_all(list([key for _, key in jokers.items() if
                                                                    key not in self.options.filler_jokers]),
-                                                             self.player) or state.has_all(
-                                                  list(joker_bundles.values()), self.player)),
+                                                             self.player) or state.has_from_list(
+                                                  list(joker_bundles.values()), self.player, len(self.joker_bundles))),
                                 difficulty_extreme, self.options.include_achievements.value)
 
         add_unlock_location(AchievementUnlocks.ante_up,
