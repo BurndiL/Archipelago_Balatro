@@ -320,7 +320,7 @@ class JokerBundleSize(Range):
     Specify the size of Joker Bundles."""
     internal_name = "joker_bundle_size"
     display_name = "Joker Bundle Size"
-    range_start = 5
+    range_start = 1
     range_end = 30
     default = 10
 

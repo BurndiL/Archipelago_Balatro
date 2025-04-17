@@ -559,8 +559,8 @@ class BalatroWorld(World):
 
                         new_location.progress_type = LocationProgressType.DEFAULT
 
-                        # to make life easier for players require some jokers to be found to beat ante 3 and up!
-                        if ante >= 3:
+                        # to make life easier for players require some jokers to be found to beat ante 2 and up!
+                        if ante >= 2:
                             add_rule(new_location, lambda state, _ante3_=ante: state.has_from_list(list(jokers.values(
                             )), self.player, min(5 + _ante3_ * 5, prog_jokers)) or state.has_from_list(
                                 list(joker_bundles.values()),
@@ -731,7 +731,7 @@ class BalatroWorld(World):
 
                         # to make life easier for players require some jokers to be found to beat ante 4 and up!
                         # (copied over from deck locations)
-                        if ante >= 4:
+                        if ante >= 2:
                             add_rule(new_location, lambda state, _ante3_=ante: state.has_from_list(list(jokers.values(
                             )), self.player, min(5 + _ante3_ * 5, prog_jokers)) or state.has_from_list(
                                 list(joker_bundles.values()),
