@@ -1443,5 +1443,8 @@ class BalatroWorld(World):
             "excluded_challenges": [key for key in self.options.exclude_challenges.value],
             "included_challenges": self.playable_challenges,
             "filler_jokers": self.options.filler_jokers.value,
+            "joker_unlocks": self.options.include_joker_unlocks.value,
+            "voucher_unlocks": self.options.include_voucher_unlocks.value,
+            "achievements": self.options.include_achievements.value,
         }
         return base_data
