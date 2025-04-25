@@ -16,7 +16,7 @@ import math
 from worlds.generic.Rules import add_rule, CollectionRule
 from .Options import BalatroOptions, Traps, IncludeDecksMode, StakeUnlockMode, \
     IncludeStakesMode, Goal, TarotBundle, SpectralBundle, PlanetBundle, ChallengeUnlockMode, IncludeJokerUnlocks, \
-    IncludeAchievements, IncludeVoucherUnlocks, IncludeChallenges, ModdedItems
+    IncludeAchievements, IncludeVoucherUnlocks, ModdedItems
 from Options import OptionError
 from .Locations import BalatroLocation, balatro_location_id_to_name, balatro_location_name_to_id, \
     balatro_location_id_to_stake, shop_id_offset, balatro_location_id_to_ante, max_shop_items, consumable_id_offset, \
@@ -104,7 +104,7 @@ class BalatroWorld(World):
                                                        self.options.include_deck_number.value]
         elif self.options.include_decks_mode.value == IncludeDecksMode.option_choose:
             # (there might be possibility of somebody doing challenge only runs)
-            if (len(self.options.include_deck_choice.value)) < 1 and not self.options.include_challenges:
+            if (len(self.options.include_deck_choice.value)) < 1 and self.options.challenge_unlock_mode.value == ChallengeUnlockMode.option_disabled:
                 raise OptionError("Must have at least one playable deck chosen.")
             self.playable_decks = self.options.include_deck_choice.value
 
@@ -148,7 +148,8 @@ class BalatroWorld(World):
 
         # makes no sense to not do this for randomly generated yamls or people accidentally setting it to false
         if self.options.goal == Goal.option_clear_challenges:
-            self.options.include_challenges.value = IncludeChallenges.option_true
+            if self.options.challenge_unlock_mode.value == ChallengeUnlockMode.option_disabled:
+                self.options.challenge_unlock_mode.value = ChallengeUnlockMode.option_vanilla
 
         # get all included challenges into a list
         for challenge in self.options.exclude_challenges.value:
@@ -353,13 +354,13 @@ class BalatroWorld(World):
             if is_challenge_unlock(item_name):
                 if self.options.challenge_unlock_mode != ChallengeUnlockMode.option_as_items:
                     continue
-                if not self.options.include_challenges:
+                if self.options.challenge_unlock_mode.value == ChallengeUnlockMode.option_disabled:
                     continue
 
             if is_challenge_deck(item_name):
                 if self.options.challenge_unlock_mode != ChallengeUnlockMode.option_as_deck:
                     continue
-                if not self.options.include_challenges:
+                if self.options.challenge_unlock_mode.value == ChallengeUnlockMode.option_disabled:
                     continue
 
             if is_import_license(item_name):
@@ -702,7 +703,7 @@ class BalatroWorld(World):
 
         challenge_region = Region("Challenges", self.player, self.multiworld)
 
-        if self.options.include_challenges.value:
+        if self.options.challenge_unlock_mode.value != ChallengeUnlockMode.option_disabled:
             for idx, challenge_name in enumerate(self.playable_challenges):
                 for location in balatro_location_name_to_id:
                     if str(location).startswith(challenge_name):
@@ -1167,7 +1168,7 @@ class BalatroWorld(World):
         add_unlock_location(AchievementUnlocks.you_get_what_you_get,
                             lambda state: True, difficulty_hard, self.options.include_achievements.value)
 
-        if self.options.include_challenges == IncludeChallenges.option_true:
+        if self.options.challenge_unlock_mode.value != ChallengeUnlockMode.option_disabled:
             add_unlock_location(AchievementUnlocks.rule_bender,
                                 lambda state: can_reach_count(state, challenge_complete_locations, 1), difficulty_easy,
                                 self.options.include_achievements.value)

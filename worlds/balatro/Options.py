@@ -253,14 +253,14 @@ class DiscoverJokerAsLocations(Choice):
     default = option_non_legendary
 
 
-class IncludeChallenges(Toggle):
-    """Include Challenges as Locations.
-        You can exclude challenges you don't want to play in the ExcludeChallenges setting.
-        False: Don't include challenges as locations.
-        True: Include challenges as locations.
-        """
-    internal_name = "include_challenges"
-    display_name = "Include Challenges"
+# class IncludeChallenges(Toggle):
+#     """Include Challenges as Locations.
+#         You can exclude challenges you don't want to play in the ExcludeChallenges setting.
+#         False: Don't include challenges as locations.
+#         True: Include challenges as locations.
+#         """
+#     internal_name = "include_challenges"
+#     display_name = "Include Challenges"
 
 
 class ExcludeChallenges(OptionSet):
@@ -304,6 +304,7 @@ class ChallengeUnlockMode(Choice):
     option_as_deck = 1
     option_as_items = 2
     option_all_unlocked = 3
+    option_disabled = 4
     default = option_as_items
 
 
@@ -583,9 +584,8 @@ class BalatroOptions(PerGameCommonOptions):
     discover_jokers_as_locations: DiscoverJokerAsLocations
 
     # Challenges
-    include_challenges: IncludeChallenges
-    exclude_challenges: ExcludeChallenges
     challenge_unlock_mode: ChallengeUnlockMode
+    exclude_challenges: ExcludeChallenges
 
     # jokers
     joker_bundles: JokerBundles

@@ -25,7 +25,6 @@ all_random_settings = {
     Options.IncludeAchievements.internal_name:          "random",
     Options.OnlyBossBlindsAreChecks.internal_name:      "random",
     Options.DiscoverJokerAsLocations.internal_name:     "random",
-    Options.IncludeChallenges.internal_name:            "random",
     Options.ExcludeChallenges.internal_name:            "random",
     Options.ChallengeUnlockMode.internal_name:          "random",
     Options.JokerBundles.internal_name:                 "random",
@@ -73,9 +72,8 @@ easy_sync_settings = {
     Options.IncludeAchievements.internal_name:          Options.IncludeAchievements.option_include_easy,
     Options.OnlyBossBlindsAreChecks.internal_name:      Options.OnlyBossBlindsAreChecks.option_false,
     Options.DiscoverJokerAsLocations.internal_name:     Options.DiscoverJokerAsLocations.option_none,   # bad for syncs
-    Options.IncludeChallenges.internal_name:            Options.IncludeChallenges.option_false,
     Options.ExcludeChallenges.internal_name:            Options.ExcludeChallenges.default,
-    Options.ChallengeUnlockMode.internal_name:          Options.ChallengeUnlockMode.default,
+    Options.ChallengeUnlockMode.internal_name:          Options.ChallengeUnlockMode.option_disabled,
     Options.JokerBundles.internal_name:                 Options.JokerBundles.option_true,   # important for syncs
     Options.JokerBundleSize.internal_name:              Options.JokerBundleSize.default,
     Options.RemoveOrDebuffJokers.internal_name:         Options.RemoveOrDebuffJokers.option_true,
@@ -120,9 +118,8 @@ medium_sync_settings = {
     Options.IncludeAchievements.internal_name:          Options.IncludeAchievements.option_include_medium,
     Options.OnlyBossBlindsAreChecks.internal_name:      Options.OnlyBossBlindsAreChecks.option_false,   # ! for syncs
     Options.DiscoverJokerAsLocations.internal_name:     Options.DiscoverJokerAsLocations.option_none,   # bad for syncs
-    Options.IncludeChallenges.internal_name:            Options.IncludeChallenges.option_false,
     Options.ExcludeChallenges.internal_name:            Options.ExcludeChallenges.default,
-    Options.ChallengeUnlockMode.internal_name:          Options.ChallengeUnlockMode.default,
+    Options.ChallengeUnlockMode.internal_name:          Options.ChallengeUnlockMode.option_disabled,
     Options.JokerBundles.internal_name:                 Options.JokerBundles.option_true,   # important for syncs
     Options.JokerBundleSize.internal_name:              5,
     Options.RemoveOrDebuffJokers.internal_name:         Options.RemoveOrDebuffJokers.option_true,
@@ -167,9 +164,8 @@ hard_sync_settings = {
     Options.IncludeAchievements.internal_name:          Options.IncludeAchievements.option_include_hard,
     Options.OnlyBossBlindsAreChecks.internal_name:      Options.OnlyBossBlindsAreChecks.option_false,   # ! for syncs
     Options.DiscoverJokerAsLocations.internal_name:     Options.DiscoverJokerAsLocations.option_none,   # bad for syncs
-    Options.IncludeChallenges.internal_name:            Options.IncludeChallenges.option_false,
     Options.ExcludeChallenges.internal_name:            Options.ExcludeChallenges.default,
-    Options.ChallengeUnlockMode.internal_name:          Options.ChallengeUnlockMode.default,
+    Options.ChallengeUnlockMode.internal_name:          Options.ChallengeUnlockMode.option_disabled,
     Options.JokerBundles.internal_name:                 Options.JokerBundles.option_true,   # important for syncs
     Options.JokerBundleSize.internal_name:              5,
     Options.RemoveOrDebuffJokers.internal_name:         Options.RemoveOrDebuffJokers.option_true,
@@ -214,9 +210,8 @@ extreme_sync_settings = {
     Options.IncludeAchievements.internal_name:          Options.IncludeAchievements.option_include_all,
     Options.OnlyBossBlindsAreChecks.internal_name:      Options.OnlyBossBlindsAreChecks.option_false,   # ! for syncs
     Options.DiscoverJokerAsLocations.internal_name:     Options.DiscoverJokerAsLocations.option_none,   # bad for syncs
-    Options.IncludeChallenges.internal_name:            Options.IncludeChallenges.option_false,
     Options.ExcludeChallenges.internal_name:            Options.ExcludeChallenges.default,
-    Options.ChallengeUnlockMode.internal_name:          Options.ChallengeUnlockMode.default,
+    Options.ChallengeUnlockMode.internal_name:          Options.ChallengeUnlockMode.option_disabled,
     Options.JokerBundles.internal_name:                 Options.JokerBundles.option_true,   # important for syncs
     Options.JokerBundleSize.internal_name:              5,
     Options.RemoveOrDebuffJokers.internal_name:         Options.RemoveOrDebuffJokers.option_false,
@@ -261,7 +256,6 @@ easy_async_settings = {
     Options.IncludeAchievements.internal_name:          Options.IncludeAchievements.option_include_easy,
     Options.OnlyBossBlindsAreChecks.internal_name:      Options.OnlyBossBlindsAreChecks.option_true,
     Options.DiscoverJokerAsLocations.internal_name:     Options.DiscoverJokerAsLocations.option_non_legendary,   # bad for syncs
-    Options.IncludeChallenges.internal_name:            Options.IncludeChallenges.option_true,
     Options.ExcludeChallenges.internal_name:            Options.ExcludeChallenges.default + ["X-ray Vision", "Double or Nothing", "Bram Poker", "Fragile"],
     Options.ChallengeUnlockMode.internal_name:          Options.ChallengeUnlockMode.default,
     Options.JokerBundles.internal_name:                 Options.JokerBundles.option_false,   # important for syncs
@@ -308,7 +302,6 @@ medium_async_settings = {
     Options.IncludeAchievements.internal_name:          Options.IncludeAchievements.option_include_medium,
     Options.OnlyBossBlindsAreChecks.internal_name:      Options.OnlyBossBlindsAreChecks.option_true,
     Options.DiscoverJokerAsLocations.internal_name:     Options.DiscoverJokerAsLocations.option_non_legendary,   # bad for syncs
-    Options.IncludeChallenges.internal_name:            Options.IncludeChallenges.option_true,
     Options.ExcludeChallenges.internal_name:            Options.ExcludeChallenges.default + ["X-ray Vision", "Double or Nothing", "Bram Poker", "Fragile"],
     Options.ChallengeUnlockMode.internal_name:          Options.ChallengeUnlockMode.default,
     Options.JokerBundles.internal_name:                 Options.JokerBundles.option_false,   # important for syncs
@@ -355,7 +348,6 @@ hard_async_settings = {
     Options.IncludeAchievements.internal_name:          Options.IncludeAchievements.option_include_hard,
     Options.OnlyBossBlindsAreChecks.internal_name:      Options.OnlyBossBlindsAreChecks.option_true,
     Options.DiscoverJokerAsLocations.internal_name:     Options.DiscoverJokerAsLocations.option_all,   # bad for syncs
-    Options.IncludeChallenges.internal_name:            Options.IncludeChallenges.option_true,
     Options.ExcludeChallenges.internal_name:            Options.ExcludeChallenges.default + ["Fragile"],
     Options.ChallengeUnlockMode.internal_name:          Options.ChallengeUnlockMode.default,
     Options.JokerBundles.internal_name:                 Options.JokerBundles.option_false,   # important for syncs
@@ -402,7 +394,6 @@ extreme_async_settings = {
     Options.IncludeAchievements.internal_name:          Options.IncludeAchievements.option_include_all,
     Options.OnlyBossBlindsAreChecks.internal_name:      Options.OnlyBossBlindsAreChecks.option_true,
     Options.DiscoverJokerAsLocations.internal_name:     Options.DiscoverJokerAsLocations.option_all,   # bad for syncs
-    Options.IncludeChallenges.internal_name:            Options.IncludeChallenges.option_true,
     Options.ExcludeChallenges.internal_name:            [],
     Options.ChallengeUnlockMode.internal_name:          Options.ChallengeUnlockMode.default,
     Options.JokerBundles.internal_name:                 Options.JokerBundles.option_false,   # important for syncs
