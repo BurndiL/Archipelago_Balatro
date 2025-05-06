@@ -763,7 +763,10 @@ class BalatroWorld(World):
                         self.locations_set += 1
                         challenge_region.locations.append(new_location)
 
-        menu_region.connect(challenge_region)
+        menu_region.connect(challenge_region, None,
+                            lambda state: can_reach_count(state,
+                                                          get_locations_where(None, 8, stake_to_number[self.required_stake]), min(5, len(self.playable_decks))) or
+                                          self.options.challenge_unlock_mode != ChallengeUnlockMode.option_vanilla)
 
         # Joker Discovery Locations
         legendary_jokers = ["Canio", "Chicot", "Perkeo", "Yorick", "Triboulet"]
