@@ -570,7 +570,7 @@ number_to_stake: Dict[int, str] = {
 
 
 def is_deck(item_name: str) -> bool:
-    return item_name.endswith("Deck") and not item_name.startswith("Challenge")     # help me
+    return item_name.endswith("Deck") and not item_name.startswith("Challenge")  # help me
 
 
 decks: Dict[int, str] = {
@@ -665,6 +665,11 @@ def is_import_license(item_name: str) -> bool:
     return item_id == 692
 
 
+def is_op_filler(item_name: str) -> bool:
+    item_id = item_name_to_id[item_name] - offset
+    return (item_id >= 301 and item_id <= 307)
+
+
 def is_progression(item_name: str) -> bool:
     return (is_deck(item_name) or
             is_joker(item_name) or
@@ -682,7 +687,7 @@ def is_progression(item_name: str) -> bool:
 
 
 def is_useful(item_name: str) -> bool:
-    return is_import_license(item_name)
+    return is_import_license(item_name) or is_progression(item_name)
 
 
 def get_category(item_name: str) -> str:

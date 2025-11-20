@@ -2,6 +2,7 @@ import typing
 
 from typing import Any, Dict, List, Union
 
+import Options
 from BaseClasses import ItemClassification, Region, Tutorial, LocationProgressType, CollectionState
 from ..AutoWorld import WebWorld, World
 from .Items import item_name_to_id, item_id_to_name, item_table, is_joker, is_joker_bundle, jokers, decks, \
@@ -14,10 +15,8 @@ from .BalatroDecks import deck_id_to_name, deck_name_to_key, challenge_id_to_nam
     AchievementUnlocks
 import math
 from worlds.generic.Rules import add_rule, CollectionRule
-from .Options import BalatroOptions, Traps, IncludeDecksMode, StakeUnlockMode, \
-    IncludeStakesMode, Goal, TarotBundle, SpectralBundle, PlanetBundle, ChallengeUnlockMode, IncludeJokerUnlocks, \
-    IncludeAchievements, IncludeVoucherUnlocks, ModdedItems
-from Options import OptionError
+from .Options import *
+from Options import OptionError, OptionGroup
 from .Locations import BalatroLocation, balatro_location_id_to_name, balatro_location_name_to_id, \
     balatro_location_id_to_stake, shop_id_offset, balatro_location_id_to_ante, max_shop_items, consumable_id_offset, \
     balatro_location_id_to_blind
@@ -29,6 +28,74 @@ class BalatroWebWorld(WebWorld):
     bug_report_page = "https://discord.gg/dESF3rzxQu"
     rich_text_options_doc = True
     options_presets = balatro_options_presets
+    option_groups = [
+        OptionGroup("Goal Options", [
+            Options.Goal,
+            Options.DecksToWin,
+            Options.JokerGoal,
+            Options.BeatAnteToWin,
+            Options.RequiredStakeForGoal,
+            Options.UniqueDeckWins,
+            Options.ChallengesForGoal,
+        ]),
+        OptionGroup("Deck Options", [
+            Options.IncludeDecksMode,
+            Options.IncludeDecksList,
+            Options.IncludeDecksNumber,
+            Options.DecksUnlockedFromStart
+        ]),
+        OptionGroup("Stake Options", [
+            Options.IncludeStakesMode,
+            Options.IncludeStakeList,
+            Options.IncludeStakesNumber,
+            Options.StakeUnlockMode
+        ]),
+        OptionGroup("Challenge Options", [
+            Options.ChallengeUnlockMode,
+            Options.ExcludeChallenges
+        ]),
+        OptionGroup("Unlocks Options", [
+            Options.IncludeJokerUnlocks,
+            Options.IncludeVoucherUnlocks,
+            Options.IncludeAchievements
+        ]),
+        OptionGroup("Joker Options", [
+            Options.JokerBundles,
+            Options.JokerBundleSize,
+            Options.RemoveOrDebuffJokers
+        ]),
+        OptionGroup("Consumable Options", [
+            Options.TarotBundle,
+            Options.CustomTarotBundles,
+            Options.PlanetBundle,
+            Options.CustomPlanetBundles,
+            Options.SpectralBundle,
+            Options.CustomSpectralBundles,
+            Options.RemoveOrDebuffConsumables,
+            Options.ArchipelagoConsumableItems
+        ]),
+        OptionGroup("Shop Options", [
+            Options.ShopItems,
+            Options.MinimumShopPrice,
+            Options.MaximumShopPrice
+        ]),
+        OptionGroup("Location Options", [
+            Options.OnlyBossBlindsAreChecks,
+            Options.DiscoverJokerAsLocations,
+        ]),
+        OptionGroup("Filler Item and Trap Options", [
+            Options.FillerJokers,
+            Options.OpFillerAmount,
+            Options.Traps
+        ]),
+        OptionGroup("Advanced Options", [
+            Options.DeathLink,
+            Options.ModdedItems,
+            Options.NumberOfImportLicenses,
+            Options.ForceYaml,
+        ]),
+    ]
+
     setup_en = Tutorial(
         "Multiworld Setup Guide",
         "A guide to setting up Balatro on your computer.",
@@ -104,7 +171,8 @@ class BalatroWorld(World):
                                                        self.options.include_deck_number.value]
         elif self.options.include_decks_mode.value == IncludeDecksMode.option_choose:
             # (there might be possibility of somebody doing challenge only runs)
-            if (len(self.options.include_deck_choice.value)) < 1 and self.options.challenge_unlock_mode.value == ChallengeUnlockMode.option_disabled:
+            if (
+                    len(self.options.include_deck_choice.value)) < 1 and self.options.challenge_unlock_mode.value == ChallengeUnlockMode.option_disabled:
                 raise OptionError("Must have at least one playable deck chosen.")
             self.playable_decks = self.options.include_deck_choice.value
 
@@ -765,7 +833,9 @@ class BalatroWorld(World):
 
         menu_region.connect(challenge_region, None,
                             lambda state: can_reach_count(state,
-                                                          get_locations_where(None, 8, stake_to_number[self.required_stake]), min(5, len(self.playable_decks))) or
+                                                          get_locations_where(None, 8,
+                                                                              stake_to_number[self.required_stake]),
+                                                          min(5, len(self.playable_decks))) or
                                           self.options.challenge_unlock_mode != ChallengeUnlockMode.option_vanilla)
 
         # Joker Discovery Locations
@@ -1366,7 +1436,8 @@ class BalatroWorld(World):
 
             self.multiworld.completion_condition[self.player] = lambda state: state.has_from_list(list(jokers.values()),
                                                                                                   self.player,
-                                                                                                  min(self.options.jokers_unlock_goal.value, prog_jokers)) or \
+                                                                                                  min(self.options.jokers_unlock_goal.value,
+                                                                                                      prog_jokers)) or \
                                                                               state.has_from_list(
                                                                                   list(joker_bundles.values()),
                                                                                   self.player, math.ceil(
@@ -1385,7 +1456,8 @@ class BalatroWorld(World):
 
             self.multiworld.completion_condition[self.player] = lambda state: \
                 can_reach_count(state, get_locations_where(None, 8, stake_to_number[self.required_stake]), 1) and \
-                (state.has_from_list(list(jokers.values()), self.player, min(self.options.jokers_unlock_goal.value, prog_jokers)) or
+                (state.has_from_list(list(jokers.values()), self.player,
+                                     min(self.options.jokers_unlock_goal.value, prog_jokers)) or
                  state.has_from_list(list(joker_bundles.values()), self.player, math.ceil(
                      self.options.jokers_unlock_goal.value / self.options.joker_bundle_size.value)))
 
